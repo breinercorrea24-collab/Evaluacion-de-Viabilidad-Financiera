@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proyecto de Transformación Tecnológica - Alicorp | Smartsheet Pro</title>
+    <title>Proyecto de Transformación Tecnológica - Alicorp | Smartsheet, Excel & VAN/TIR Dinámico</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- SheetJS (xlsx) for Excel Export & Import -->
@@ -38,7 +38,7 @@
                 <span class="bg-indigo-600 text-xs uppercase px-2.5 py-1 rounded font-semibold tracking-wider">Smartsheet Pro</span>
                 <h1 class="text-xl font-bold tracking-tight">Proyecto de Transformación Tecnológica - Alicorp</h1>
             </div>
-            <p class="text-slate-400 text-xs mt-1">Haz clic en cualquier barra del diagrama de Gantt para abrir el detalle de tarea</p>
+            <p class="text-slate-400 text-xs mt-1">Control Financiero, Gantt, VAN/TIR Dinámico (Años o Meses)</p>
         </div>
         <div class="flex items-center space-x-2.5 flex-wrap">
             <!-- Financial Dashboard Button -->
@@ -251,17 +251,28 @@
 
             <!-- Modal Content -->
             <div class="p-6 overflow-y-auto space-y-6 bg-slate-50 flex-1">
-                <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200 grid grid-cols-1 md:grid-cols-5 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Inversión Inicial ($) [D₀ - Calculada de Excel]</label>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Inversión Inicial ($) [D₀]</label>
                         <input type="number" id="inputInitialInv" value="120000" onchange="calculateFinancials()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Tasa de Descuento / k (%)</label>
                         <input type="number" id="inputDiscountRate" value="12" step="0.5" onchange="calculateFinancials()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                     </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Periodicidad</label>
+                        <select id="inputPeriodType" onchange="calculateFinancials()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                            <option value="years">Años</option>
+                            <option value="months" selected>Meses</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Plazo (N Periodos)</label>
+                        <input type="number" id="inputProjectionPeriods" value="12" min="1" max="120" onchange="calculateFinancials()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                    </div>
                     <div class="flex items-end">
-                        <button onclick="resetDefaults()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 rounded-lg border border-slate-300 transition">Sincronizar con Excel</button>
+                        <button onclick="resetDefaults()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 rounded-lg border border-slate-300 transition">Sincronizar</button>
                     </div>
                 </div>
 
@@ -303,13 +314,13 @@
                 <div class="bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden">
                     <div class="bg-slate-100 px-4 py-3 border-b border-slate-200 flex justify-between items-center">
                         <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Flujo de Caja Proyectado (FCⱼ) - Derivado de Costos y Presupuestos</h3>
-                        <span class="text-xs text-slate-500">Años 0 al 5</span>
+                        <span id="cashFlowSubtitle" class="text-xs text-slate-500">Periodos</span>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-xs text-left">
                             <thead class="bg-slate-50 text-slate-600 border-b border-slate-200 font-semibold">
                                 <tr>
-                                    <th class="px-4 py-2.5">Periodo (Año)</th>
+                                    <th class="px-4 py-2.5">Periodo</th>
                                     <th class="px-4 py-2.5 text-right">Flujo de Caja (FCⱼ / $)</th>
                                     <th class="px-4 py-2.5 text-right">Valor Actualizado / Descontado</th>
                                     <th class="px-4 py-2.5 text-right">Flujo Acumulado</th>
@@ -492,7 +503,6 @@
             activeTaskId = taskId;
             let taskObj = null;
 
-            // Search in projectData
             projectData.forEach(phase => {
                 if (phase.id === taskId) taskObj = phase;
                 if (phase.children) {
@@ -504,7 +514,6 @@
 
             if (!taskObj) return;
 
-            // Populate form fields
             document.getElementById("modalTaskRowId").textContent = `ID: ${taskObj.id}`;
             document.getElementById("modalTaskName").value = taskObj.name || "";
             document.getElementById("modalTaskAssignee").value = taskObj.assignee || "";
@@ -717,20 +726,26 @@
             const totalCost = calculateTotalActualCost();
             document.getElementById("inputInitialInv").value = totalCost.toFixed(2);
             document.getElementById("inputDiscountRate").value = 12;
+            document.getElementById("inputPeriodType").value = "months";
+            document.getElementById("inputProjectionPeriods").value = 12;
             calculateFinancials();
         }
 
         function calculateFinancials() {
             const D0 = parseFloat(document.getElementById("inputInitialInv").value) || calculateTotalActualCost();
-            const k = (parseFloat(document.getElementById("inputDiscountRate").value) || 0) / 100;
+            const rawK = (parseFloat(document.getElementById("inputDiscountRate").value) || 0) / 100;
+            const periodType = document.getElementById("inputPeriodType").value;
+            const numPeriods = parseInt(document.getElementById("inputProjectionPeriods").value) || 12;
 
-            const cashFlows = [
-                { year: 1, fc: D0 * 0.35 },
-                { year: 2, fc: D0 * 0.45 },
-                { year: 3, fc: D0 * 0.55 },
-                { year: 4, fc: D0 * 0.65 },
-                { year: 5, fc: D0 * 0.75 }
-            ];
+            // Adjust discount rate k depending on whether periods are years or months
+            // If months, monthly rate = rawK / 12 (nominal) or equivalent
+            const k = periodType === "months" ? rawK / 12 : rawK;
+
+            let cashFlows = [];
+            for (let i = 1; i <= numPeriods; i++) {
+                let factor = 0.05 + (i * 0.02); // incremental monthly or yearly factor
+                cashFlows.push({ period: i, fc: D0 * factor });
+            }
 
             let VAN = -D0;
             let discountedSum = 0;
@@ -738,10 +753,11 @@
             let tableHTML = "";
 
             const fmtD0 = D0.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            const periodLabel = periodType === "months" ? "Mes" : "Año";
 
             tableHTML += `
                 <tr class="bg-slate-50 font-semibold">
-                    <td class="px-4 py-2.5">Año 0 (Inversión Inicial)</td>
+                    <td class="px-4 py-2.5">Periodo 0 (Inversión Inicial)</td>
                     <td class="px-4 py-2.5 text-right text-rose-600 font-mono">-$${fmtD0}</td>
                     <td class="px-4 py-2.5 text-right font-mono">-$${fmtD0}</td>
                     <td class="px-4 py-2.5 text-right font-mono text-rose-600">-$${fmtD0}</td>
@@ -749,7 +765,7 @@
             `;
 
             cashFlows.forEach(item => {
-                const discounted = item.fc / Math.pow(1 + k, item.year);
+                const discounted = item.fc / Math.pow(1 + k, item.period);
                 discountedSum += discounted;
                 cumulative += item.fc;
 
@@ -759,7 +775,7 @@
 
                 tableHTML += `
                     <tr>
-                        <td class="px-4 py-2.5">Año ${item.year}</td>
+                        <td class="px-4 py-2.5">${periodLabel} ${item.period}</td>
                         <td class="px-4 py-2.5 text-right text-emerald-600 font-mono">+$${fmtFc}</td>
                         <td class="px-4 py-2.5 text-right font-mono">$${fmtDisc}</td>
                         <td class="px-4 py-2.5 text-right font-mono">$${fmtCum}</td>
@@ -775,8 +791,8 @@
                 let npv = -D0;
                 let dNpv = 0;
                 cashFlows.forEach(item => {
-                    npv += item.fc / Math.pow(1 + tir, item.year);
-                    dNpv -= item.year * item.fc / Math.pow(1 + tir, item.year + 1);
+                    npv += item.fc / Math.pow(1 + tir, item.period);
+                    dNpv -= item.period * item.fc / Math.pow(1 + tir, item.period + 1);
                 });
                 if (Math.abs(npv) < 1e-5) break;
                 if (dNpv === 0) break;
@@ -784,16 +800,18 @@
             }
             const TIR_pct = (tir * 100).toFixed(2);
 
-            let paybackMonths = 0;
+            let paybackTime = 0;
             let runningSum = D0;
             for (let i = 0; i < cashFlows.length; i++) {
                 if (runningSum <= cashFlows[i].fc) {
-                    paybackMonths = (i + (runningSum / cashFlows[i].fc)) * 12;
+                    paybackTime = (i + (runningSum / cashFlows[i].fc));
                     break;
                 }
                 runningSum -= cashFlows[i].fc;
             }
-            if (paybackMonths === 0) paybackMonths = 60;
+            if (paybackTime === 0) paybackTime = numPeriods;
+
+            const paybackDisplay = periodType === "months" ? `${paybackTime.toFixed(1)} Meses` : `${(paybackTime * 12).toFixed(1)} Meses (${paybackTime.toFixed(1)} Años)`;
 
             const fmtVAN = VAN.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             const valVanEl = document.getElementById("valVan");
@@ -819,7 +837,8 @@
             badgeBC.textContent = BC_Ratio >= 1 ? "Viable" : "No Viable";
             badgeBC.className = BC_Ratio >= 1 ? "text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold" : "text-[10px] bg-rose-100 text-rose-800 px-2 py-0.5 rounded-full font-bold";
 
-            document.getElementById("valPayback").textContent = `${paybackMonths.toFixed(1)} Meses`;
+            document.getElementById("valPayback").textContent = paybackDisplay;
+            document.getElementById("cashFlowSubtitle").textContent = `Periodos de 0 a ${numPeriods} (${periodType === "months" ? "Meses" : "Años"})`;
             document.getElementById("cashFlowTableBody").innerHTML = tableHTML;
         }
 
