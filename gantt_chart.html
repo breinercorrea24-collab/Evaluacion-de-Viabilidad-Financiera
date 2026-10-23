@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proyecto de Transformación Tecnológica - Alicorp | Smartsheet Pro</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SheetJS (xlsx) for Excel Export & Import -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .gantt-grid {
+            background-size: 40px 100%;
+            background-image: linear-gradient(to right, #e2e8f0 1px, transparent 1px);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-slate-900 text-white shadow-md px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div>
+            <div class="flex items-center space-x-3">
+                <span class="bg-indigo-600 text-xs uppercase px-2.5 py-1 rounded font-semibold tracking-wider">Smartsheet Pro</span>
+                <h1 class="text-xl font-bold tracking-tight">Proyecto de Transformación Tecnológica - Alicorp</h1>
+            </div>
+            <p class="text-slate-400 text-xs mt-1">Haz clic en cualquier barra del diagrama de Gantt para abrir el detalle de tarea</p>
+        </div>
+        <div class="flex items-center space-x-2.5 flex-wrap">
+            <!-- Financial Dashboard Button -->
+            <button onclick="openFinancialModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow-md transition flex items-center space-x-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>📊 VAN & TIR (Dinámico)</span>
+            </button>
+
+            <!-- Export to Excel Button -->
+            <button onclick="exportToExcel()" class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow-md transition flex items-center space-x-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                <span>📤 Exportar Excel</span>
+            </button>
+
+            <!-- Import from Excel Button -->
+            <label class="bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow-md transition cursor-pointer flex items-center space-x-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                <span>📥 Importar Excel</span>
+                <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" onchange="importFromExcel(event)" class="hidden">
+            </label>
+
+            <button onclick="expandAll()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-2.5 py-2 rounded border border-slate-700 transition">Expandir</button>
+            <button onclick="collapseAll()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-2.5 py-2 rounded border border-slate-700 transition">Contraer</button>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container (Split Pane) -->
+    <main class="flex-1 flex overflow-hidden border-t border-slate-200">
+
+        <!-- Left Pane: Tasks Table with Extended Columns -->
+        <div class="w-full md:w-7/12 xl:w-7/12 bg-white border-r border-slate-200 flex flex-col shadow-sm z-10 overflow-x-auto">
+            <div class="min-w-[1100px]">
+                <!-- Table Header -->
+                <div class="bg-slate-100 border-b border-slate-200 px-3 py-2.5 grid grid-cols-12 text-[11px] font-bold text-slate-600 uppercase tracking-wider items-center">
+                    <div class="col-span-3">Tasks</div>
+                    <div class="col-span-2">Assigned To</div>
+                    <div class="col-span-1 text-right">Budget</div>
+                    <div class="col-span-1 text-right">Actual Cost</div>
+                    <div class="col-span-1 text-right">Variance</div>
+                    <div class="col-span-1 text-center">Status</div>
+                    <div class="col-span-1 text-center">% Comp.</div>
+                    <div class="col-span-1 text-right">Eficiencia</div>
+                    <div class="col-span-1 text-left pl-2">Área</div>
+                </div>
+                <!-- Table Body -->
+                <div id="taskTableBody" class="divide-y divide-slate-100 text-xs">
+                    <!-- Populated via JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Pane: Gantt Chart Timeline -->
+        <div class="hidden md:flex flex-1 flex-col bg-slate-50 overflow-x-auto">
+            <!-- Timeline Months & Days Header -->
+            <div class="bg-white border-b border-slate-200 sticky top-0 z-20 flex flex-col min-w-[800px]">
+                <!-- Months -->
+                <div class="flex border-b border-slate-200 text-xs font-bold text-slate-700 bg-slate-100">
+                    <div class="w-40 border-r border-slate-200 px-3 py-1.5 text-center">Octubre 2026</div>
+                    <div class="w-40 border-r border-slate-200 px-3 py-1.5 text-center">Noviembre 2026</div>
+                    <div class="w-40 border-r border-slate-200 px-3 py-1.5 text-center">Diciembre 2026</div>
+                    <div class="w-40 border-r border-slate-200 px-3 py-1.5 text-center">Enero 2027</div>
+                    <div class="w-40 px-3 py-1.5 text-center">Febrero 2027</div>
+                </div>
+                <!-- Weeks / Markers -->
+                <div class="flex text-[10px] text-slate-500 bg-slate-50 h-7 items-center">
+                    <div class="w-40 border-r border-slate-200 px-2 flex justify-between"><span>Oct 4</span><span>Oct 11</span><span>Oct 18</span><span>Oct 25</span></div>
+                    <div class="w-40 border-r border-slate-200 px-2 flex justify-between"><span>Nov 1</span><span>Nov 8</span><span>Nov 15</span><span>Nov 22</span></div>
+                    <div class="w-40 border-r border-slate-200 px-2 flex justify-between"><span>Dic 6</span><span>Dic 13</span><span>Dic 20</span><span>Dic 27</span></div>
+                    <div class="w-40 border-r border-slate-200 px-2 flex justify-between"><span>Ene 3</span><span>Ene 10</span><span>Ene 17</span><span>Ene 24</span></div>
+                    <div class="w-40 px-2 flex justify-between"><span>Feb 7</span><span>Feb 14</span><span>Feb 21</span><span>Feb 28</span></div>
+                </div>
+            </div>
+            <!-- Timeline Chart Body -->
+            <div id="ganttChartBody" class="flex-1 overflow-y-auto relative gantt-grid divide-y divide-slate-100 min-w-[800px]">
+                <!-- Populated via JavaScript -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Smartsheet Task Detail & Edit Modal -->
+    <div id="taskModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in duration-200">
+
+            <!-- Left Side: Task Edit Form (Smartsheet Style) -->
+            <div class="flex-1 p-6 overflow-y-auto border-r border-slate-200 flex flex-col justify-between">
+                <div>
+                    <!-- Header -->
+                    <div class="flex justify-between items-center pb-4 border-b border-slate-200 mb-4">
+                        <div class="flex items-center space-x-2">
+                            <span class="bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded font-bold">Editar Tarea</span>
+                            <span id="modalTaskRowId" class="text-xs text-slate-400 font-mono">ID: --</span>
+                        </div>
+                        <button onclick="closeTaskModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+
+                    <!-- Form Inputs -->
+                    <div class="space-y-4 text-xs">
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">Tasks (Nombre)</label>
+                            <input type="text" id="modalTaskName" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">Assigned To (Responsable)</label>
+                            <input type="text" id="modalTaskAssignee" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-semibold text-slate-600 mb-1">Budget ($)</label>
+                                <input type="text" id="modalTaskBudget" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block font-semibold text-slate-600 mb-1">Actual Cost ($)</label>
+                                <input type="text" id="modalTaskCost" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-semibold text-slate-600 mb-1">Duration</label>
+                                <input type="text" id="modalTaskDuration" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block font-semibold text-slate-600 mb-1">% Completado</label>
+                                <input type="text" id="modalTaskPercent" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-semibold text-slate-600 mb-1">Status</label>
+                                <select id="modalTaskStatus" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                                    <option value="Complete">Complete</option>
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Not Started">Not Started</option>
+                                    <option value="Aprobado">Aprobado</option>
+                                    <option value="Enviado">Enviado</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-semibold text-slate-600 mb-1">Área / Módulo</label>
+                                <input type="text" id="modalTaskArea" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Footer Actions -->
+                <div class="pt-4 border-t border-slate-200 mt-6 flex justify-end space-x-2">
+                    <button onclick="closeTaskModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-4 py-2 rounded-lg transition">Cancelar</button>
+                    <button onclick="saveTaskModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-5 py-2 rounded-lg shadow-sm transition">Aceptar</button>
+                </div>
+            </div>
+
+            <!-- Right Side: Smartsheet Conversations / Comments Panel -->
+            <div class="w-full md:w-5/12 bg-slate-50 p-6 flex flex-col justify-between">
+                <div>
+                    <div class="text-center pb-4 border-b border-slate-200">
+                        <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                        </div>
+                        <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Conversaciones en el contexto de su trabajo</h3>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Empiece por introducir el primer comentario a continuación.</p>
+                    </div>
+
+                    <div id="commentList" class="my-4 space-y-3 overflow-y-auto max-h-48 text-xs">
+                        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
+                            <div class="flex items-center space-x-2 mb-1">
+                                <span class="w-5 h-5 bg-emerald-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">Y</span>
+                                <span class="font-semibold text-slate-700">Yeslit Rosié</span>
+                                <span class="text-[10px] text-slate-400 ml-auto">Hace 2 horas</span>
+                            </div>
+                            <p class="text-slate-600">Revisión de avances y entregables completados para esta tarea.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comment Input -->
+                <div class="border-t border-slate-200 pt-3">
+                    <div class="flex items-center space-x-2 bg-white border border-slate-300 rounded-lg p-2 shadow-xs">
+                        <input type="text" id="newCommentInput" placeholder="Comentar o notificar a otras personas con @" class="flex-1 text-xs focus:outline-none">
+                        <button onclick="addComment()" class="bg-indigo-600 hover:bg-indigo-500 text-white p-1.5 rounded-md transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Financial Dashboard Modal (VAN & TIR) -->
+    <div id="financialModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+            <!-- Modal Header -->
+            <div class="bg-slate-900 text-white px-6 py-4 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-emerald-600 p-2 rounded-lg">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold">Dashboard Financiero y Evaluación de Inversión (VAN & TIR) Dinámico</h2>
+                        <p class="text-xs text-slate-400">Calculado automáticamente desde los Costos y Presupuestos del Excel</p>
+                    </div>
+                </div>
+                <button onclick="closeFinancialModal()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="p-6 overflow-y-auto space-y-6 bg-slate-50 flex-1">
+                <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Inversión Inicial ($) [D₀ - Calculada de Excel]</label>
+                        <input type="number" id="inputInitialInv" value="120000" onchange="calculateFinancials()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Tasa de Descuento / k (%)</label>
+                        <input type="number" id="inputDiscountRate" value="12" step="0.5" onchange="calculateFinancials()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="resetDefaults()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 rounded-lg border border-slate-300 transition">Sincronizar con Excel</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200 flex flex-col justify-between">
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-semibold text-slate-500">VAN (Valor Actual Neto)</span>
+                            <span id="badgeVan" class="text-[10px] px-2 py-0.5 rounded-full font-bold"></span>
+                        </div>
+                        <div class="my-3"><span id="valVan" class="text-2xl font-black text-slate-900">$0.00</span></div>
+                        <p class="text-[11px] text-slate-400">VAN > 0 (Proyecto Rentable)</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200 flex flex-col justify-between">
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-semibold text-slate-500">TIR (Tasa Interna Retorno)</span>
+                            <span id="badgeTir" class="text-[10px] px-2 py-0.5 rounded-full font-bold"></span>
+                        </div>
+                        <div class="my-3"><span id="valTir" class="text-2xl font-black text-slate-900">0.00%</span></div>
+                        <p class="text-[11px] text-slate-400">Tasa de rendimiento interno</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200 flex flex-col justify-between">
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-semibold text-slate-500">Relación Beneficio/Costo (B/C)</span>
+                            <span id="badgeBC" class="text-[10px] px-2 py-0.5 rounded-full font-bold"></span>
+                        </div>
+                        <div class="my-3"><span id="valBC" class="text-2xl font-black text-slate-900">0.00</span></div>
+                        <p class="text-[11px] text-slate-400">B/C > 1 (Viable)</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200 flex flex-col justify-between">
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-semibold text-slate-500">Periodo de Recuperación (Payback)</span>
+                            <span class="text-[10px] bg-sky-100 text-sky-800 px-2 py-0.5 rounded-full font-bold">Plazo</span>
+                        </div>
+                        <div class="my-3"><span id="valPayback" class="text-2xl font-black text-slate-900">0.0 Meses</span></div>
+                        <p class="text-[11px] text-slate-400">Recuperación de inversión</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden">
+                    <div class="bg-slate-100 px-4 py-3 border-b border-slate-200 flex justify-between items-center">
+                        <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Flujo de Caja Proyectado (FCⱼ) - Derivado de Costos y Presupuestos</h3>
+                        <span class="text-xs text-slate-500">Años 0 al 5</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs text-left">
+                            <thead class="bg-slate-50 text-slate-600 border-b border-slate-200 font-semibold">
+                                <tr>
+                                    <th class="px-4 py-2.5">Periodo (Año)</th>
+                                    <th class="px-4 py-2.5 text-right">Flujo de Caja (FCⱼ / $)</th>
+                                    <th class="px-4 py-2.5 text-right">Valor Actualizado / Descontado</th>
+                                    <th class="px-4 py-2.5 text-right">Flujo Acumulado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cashFlowTableBody" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white border-t border-slate-200 px-6 py-3 flex justify-end">
+                <button onclick="closeFinancialModal()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-5 py-2.5 rounded-lg transition">Cerrar Dashboard</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Status -->
+    <footer class="bg-white border-t border-slate-200 px-6 py-2 text-xs text-slate-500 flex justify-between items-center">
+        <div>Proyecto Enterprise - Módulo Contable, Financiero y de Control Interno</div>
+        <div class="flex items-center space-x-4">
+            <span class="flex items-center"><span class="w-3 h-3 bg-indigo-500 rounded-sm inline-block mr-1.5"></span> Fase / Resumen</span>
+            <span class="flex items-center"><span class="w-3 h-3 bg-sky-500 rounded-sm inline-block mr-1.5"></span> En Curso</span>
+            <span class="flex items-center"><span class="w-3 h-3 bg-rose-500 rounded-sm inline-block mr-1.5"></span> Riesgo / Alerta</span>
+        </div>
+    </footer>
+
+    <!-- JavaScript Data & Render Engine -->
+    <script>
+        let projectData = [
+            {
+                id: "fase1", type: "phase", name: "FASE I: DIAGNÓSTICO Y BLUEPRINT CONTABLE", duration: "42d", assignee: "heydi.ricanqui@unmsm.edu.pe", budget: "$21,000.00", actualCost: "$20,500.00", variance: "$500.00", status: "In Progress", percent: "50.00%", efficiency: "2.38%", area: "CONTABILIDAD", offset: 0, width: 35, color: "bg-indigo-600",
+                children: [
+                    { id: "t1_1", type: "task", name: "Levantamiento de procesos contables actuales (As-Is)", duration: "16d", assignee: "YESLIT ROSIÉ CORREA ATUCS", budget: "$6,000.00", actualCost: "$5,500.00", variance: "$500.00", status: "In Progress", percent: "100.00%", efficiency: "8.33%", area: "CONTABILIDAD", offset: 0, width: 7, color: "bg-sky-500" },
+                    { id: "t1_1_1", type: "subtask", name: "Inventariar el plan de cuentas actual (PCGE)", duration: "5d", assignee: "YESLIT ROSIÉ CORREA ATUCS", budget: "$1,500.00", actualCost: "$1,500.00", variance: "$0.00", status: "Complete", percent: "100.00%", efficiency: "0.00%", area: "CONTABILIDAD", offset: 1, width: 3, color: "bg-sky-400" },
+                    { id: "t1_1_2", type: "subtask", name: "Listar procesos contables (compras, inventarios, costos, activos fijos, cierre)", duration: "5d", assignee: "YESLIT ROSIÉ CORREA ATUCS", budget: "$2,500.00", actualCost: "$2,500.00", variance: "$0.00", status: "Complete", percent: "100.00%", efficiency: "0.00%", area: "CONTABILIDAD", offset: 3, width: 4, color: "bg-sky-400" },
+                    { id: "t1_1_3", type: "subtask", name: "Identificar brechas del esquema actual", duration: "6d", assignee: "YESLIT ROSIÉ CORREA ATUCS", budget: "$2,000.00", actualCost: "$1,500.00", variance: "$500.00", status: "Complete", percent: "100.00%", efficiency: "25.00%", area: "CONTABILIDAD", offset: 5, width: 3, color: "bg-sky-400" },
+                    { id: "t1_2", type: "task", name: "Diseño del catálogo de cuentas y estructura de costos en el ERP", duration: "26d", assignee: "YESLIT ROSIÉ CORREA ATUCS", budget: "$8,000.00", actualCost: "$8,000.00", variance: "$0.00", status: "Complete", percent: "100.00%", efficiency: "0.00%", area: "CONTABILIDAD", offset: 7, width: 14, color: "bg-sky-500" },
+                    { id: "t1_3", type: "task", name: "Elaboración de la matriz de riesgos de la inversión e impacto", duration: "4d", assignee: "RICANQUI RAMIREZ", budget: "$4,000.00", actualCost: "$4,000.00", variance: "$0.00", status: "Complete", percent: "100.00%", efficiency: "0.00%", area: "FINANZAS Y CAPEX", offset: 15, width: 6, color: "bg-rose-500" },
+                    { id: "t1_4", type: "task", name: "Estimación del presupuesto Capex y flujo de ahorros esperados", duration: "4d", assignee: "henry mauricio huamani", budget: "$3,000.00", actualCost: "$3,000.00", variance: "$0.00", status: "Complete", percent: "100.00%", efficiency: "0.00%", area: "FINANZAS Y CAPEX", offset: 18, width: 7, color: "bg-sky-500" }
+                ]
+            },
+            {
+                id: "fase2", type: "phase", name: "FASE II: CONFIGURACIÓN, ADQUISICIÓN Y CONTROL INTERNO", duration: "20d", assignee: "hmauriciohuamani@gmail.com", budget: "$50,000.00", actualCost: "$52,300.00", variance: "-$2,300.00", status: "Complete", percent: "100.00%", efficiency: "-4.60%", area: "FINANZAS Y CAPEX", offset: 22, width: 28, color: "bg-indigo-600",
+                children: [
+                    { id: "t2_1", type: "task", name: "Gestión y adquisición de licencias Cloud del ERP", duration: "5d", assignee: "henry mauricio huamani", budget: "$35,000.00", actualCost: "$38,000.00", variance: "-$3,000.00", status: "Complete", percent: "100.00%", efficiency: "-8.57%", area: "FINANZAS Y CAPEX", offset: 22, width: 8, color: "bg-rose-500" },
+                    { id: "t2_2", type: "task", name: "Configuración de reglas de Segregación de Funciones (SoD)", duration: "10d", assignee: "heydi.ricanqui@unmsm.edu.pe", budget: "$6,000.00", actualCost: "$5,800.00", variance: "$200.00", status: "Complete", percent: "100.00%", efficiency: "3.33%", area: "CONTROL INTERNO Y CALIDAD", offset: 26, width: 7, color: "bg-sky-500" },
+                    { id: "t2_3", type: "task", name: "Creación de reglas y flujos de automatización en Smartsheet", duration: "10d", assignee: "heydi.ricanqui@unmsm.edu.pe", budget: "$4,000.00", actualCost: "$4,000.00", variance: "$0.00", status: "Complete", percent: "100.00%", efficiency: "0.00%", area: "CONTROL INTERNO Y CALIDAD", offset: 28, width: 7, color: "bg-sky-500" },
+                    { id: "t2_4", type: "task", name: "Control presupuestal y configuración de fórmulas financieras", duration: "5d", assignee: "hmauriciohuamani@gmail.com", budget: "$5,000.00", actualCost: "$4,500.00", variance: "$500.00", status: "Enviado", percent: "100.00%", efficiency: "10.00%", area: "FINANZAS Y CAPEX", offset: 31, width: 10, color: "bg-sky-500" }
+                ]
+            },
+            {
+                id: "fase3", type: "phase", name: "FASE III: MIGRACIÓN DE DATOS Y PRUEBAS UAT", duration: "74d", assignee: "dayabotellosald@gmail.com", budget: "$22,000.00", actualCost: "$23,200.00", variance: "-$1,200.00", status: "In Progress", percent: "50.00%", efficiency: "-5.45%", area: "CONTABILIDAD", offset: 38, width: 42, color: "bg-indigo-600",
+                children: [
+                    { id: "t3_1", type: "task", name: "Depuración y carga de saldos iniciales del plan de cuentas", duration: "54d", assignee: "yeslit.correa@unmsm.edu.pe", budget: "$7,000.00", actualCost: "$7,000.00", variance: "$0.00", status: "In Progress", percent: "50.00%", efficiency: "0.00%", area: "CONTABILIDAD", offset: 38, width: 16, color: "bg-sky-500" },
+                    { id: "t3_2", type: "task", name: "Habilitación del Formulario de Incidencias UAT en Smartsheet", duration: "10d", assignee: "dayabotellosald@gmail.com", budget: "$8,000.00", actualCost: "$9,200.00", variance: "-$1,200.00", status: "Aprobado", percent: "100.00%", efficiency: "-15.00%", area: "CONTROL INTERNO Y CALIDAD", offset: 50, width: 6, color: "bg-rose-500" },
+                    { id: "t3_3", type: "task", name: "Migración del módulo de Activos Fijos y depreciación acumulada", duration: "10d", assignee: "yeslit.correa@unmsm.edu.pe", budget: "$2,000.00", actualCost: "$2,000.00", variance: "$0.00", status: "Not Started", percent: "0.00%", efficiency: "0.00%", area: "CONTABILIDAD", offset: 52, width: 8, color: "bg-sky-500" },
+                    { id: "t3_4", type: "task", name: "Ejecución de pruebas de integración contable-financiera", duration: "11d", assignee: "dayabotellosald@gmail.com", budget: "$5,000.00", actualCost: "$5,000.00", variance: "$0.00", status: "Not Started", percent: "0.00%", efficiency: "0.00%", area: "CONTROL INTERNO Y CALIDAD", offset: 56, width: 11, color: "bg-sky-500" }
+                ]
+            },
+            {
+                id: "fase4", type: "phase", name: "FASE IV: CAPACITACIÓN Y GESTIÓN DEL CAMBIO", duration: "11d", assignee: "gianpierre.cardenas@unmsm", budget: "$11,000.00", actualCost: "$10,800.00", variance: "$200.00", status: "Complete", percent: "100.00%", efficiency: "1.82%", area: "TECNOLOGIA Y CAPACITACION", offset: 65, width: 25, color: "bg-indigo-600",
+                children: [
+                    { id: "t4_1", type: "task", name: "Elaboración de manuales de usuario para el área contable", duration: "5d", assignee: "gianpierre.cardenas@unmsm", budget: "$3,000.00", actualCost: "$2,800.00", variance: "$200.00", status: "Aprobado", percent: "100.00%", efficiency: "6.67%", area: "TECNOLOGIA Y CAPACITACION", offset: 65, width: 8, color: "bg-sky-500" },
+                    { id: "t4_2", type: "task", name: "Capacitación técnica al equipo de Contabilidad y Tributos", duration: "6d", assignee: "gianpierre.cardenas@unmsm", budget: "$6,000.00", actualCost: "$6,000.00", variance: "$0.00", status: "Aprobado", percent: "100.00%", efficiency: "0.00%", area: "TECNOLOGIA Y CAPACITACION", offset: 70, width: 10, color: "bg-sky-500" },
+                    { id: "t4_3", type: "task", name: "Organización y seguimiento del tablero Kanban de capacitación", duration: "4d", assignee: "gianpierre.cardenas@unmsm", budget: "$2,000.00", actualCost: "$2,000.00", variance: "$0.00", status: "Enviado", percent: "100.00%", efficiency: "0.00%", area: "TECNOLOGIA Y CAPACITACION", offset: 73, width: 14, color: "bg-sky-500" }
+                ]
+            },
+            {
+                id: "fase5", type: "phase", name: "FASE V: GO-LIVE, DASHBOARD Y AUDITORÍA FINAL", duration: "10d", assignee: "Velasquez Machado Guisel", budget: "$16,000.00", actualCost: "$14,500.00", variance: "$1,500.00", status: "Complete", percent: "100.00%", efficiency: "9.38%", area: "Gestión de Proyecto", offset: 82, width: 20, color: "bg-indigo-600",
+                children: [
+                    { id: "t5_1", type: "task", name: "Diseño del Dashboard Ejecutivo con métricas e indicadores", duration: "5d", assignee: "oshin.tarazona@unmsm.edu.pe", budget: "$4,000.00", actualCost: "$3,500.00", variance: "$500.00", status: "Aprobado", percent: "100.00%", efficiency: "12.50%", area: "Business Intelligence", offset: 82, width: 7, color: "bg-sky-500" },
+                    { id: "t5_2", type: "task", name: "Configuración de gráficos en tiempo real y medidores de avance", duration: "3d", assignee: "oshin.tarazona@unmsm.edu.pe", budget: "$3,000.00", actualCost: "$2,000.00", variance: "$1,000.00", status: "Complete", percent: "100.00%", efficiency: "33.33%", area: "Business Intelligence", offset: 86, width: 7, color: "bg-sky-500" },
+                    { id: "t5_3", type: "task", name: "Cierre de fase de pruebas y autorización de salida a producción", duration: "1d", assignee: "Velasquez Machado Guisel", budget: "$5,000.00", actualCost: "$5,000.00", variance: "$0.00", status: "Not Started", percent: "0.00%", efficiency: "0.00%", area: "Gestión de Proyecto", offset: 90, width: 4, color: "bg-rose-500" },
+                    { id: "t5_4", type: "task", name: "Auditoría de calidad y validación final de la Ruta Crítica", duration: "1d", assignee: "Velasquez Machado Guisel", budget: "$4,000.00", actualCost: "$4,000.00", variance: "$0.00", status: "Not Started", percent: "0.00%", efficiency: "0.00%", area: "Gestión de Proyecto", offset: 92, width: 4, color: "bg-rose-500" }
+                ]
+            }
+        ];
+
+        let expandedPhases = { fase1: true, fase2: true, fase3: true, fase4: true, fase5: true };
+
+        function togglePhase(phaseId) {
+            expandedPhases[phaseId] = !expandedPhases[phaseId];
+            renderGantt();
+        }
+
+        function expandAll() {
+            Object.keys(expandedPhases).forEach(k => expandedPhases[k] = true);
+            renderGantt();
+        }
+
+        function collapseAll() {
+            Object.keys(expandedPhases).forEach(k => expandedPhases[k] = false);
+            renderGantt();
+        }
+
+        function renderGantt() {
+            const tableBody = document.getElementById("taskTableBody");
+            const chartBody = document.getElementById("ganttChartBody");
+            let tableHTML = "", chartHTML = "";
+
+            projectData.forEach(phase => {
+                const isExpanded = expandedPhases[phase.id];
+                const chevron = isExpanded
+                    ? `<svg class="w-4 h-4 text-slate-500 transform rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>`
+                    : `<svg class="w-4 h-4 text-slate-500 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>`;
+
+                const varColorP = (phase.variance && phase.variance.startsWith("-")) ? "text-rose-600 font-semibold" : "text-emerald-600 font-semibold";
+                const effColorP = (phase.efficiency && phase.efficiency.startsWith("-")) ? "text-rose-600" : "text-emerald-600";
+
+                tableHTML += `
+                    <div onclick="togglePhase('${phase.id}')" class="grid grid-cols-12 px-3 py-2.5 bg-indigo-50/70 hover:bg-indigo-100/75 cursor-pointer font-semibold text-indigo-900 border-b border-indigo-100 items-center transition">
+                        <div class="col-span-3 flex items-center space-x-1.5 truncate">
+                            ${chevron}
+                            <span class="truncate" title="${phase.name}">${phase.name}</span>
+                        </div>
+                        <div class="col-span-2 text-slate-600 truncate text-[11px]" title="${phase.assignee}">${phase.assignee}</div>
+                        <div class="col-span-1 text-right font-mono">${phase.budget}</div>
+                        <div class="col-span-1 text-right font-mono">${phase.actualCost}</div>
+                        <div class="col-span-1 text-right font-mono ${varColorP}">${phase.variance}</div>
+                        <div class="col-span-1 text-center"><span class="bg-indigo-100 text-indigo-800 text-[10px] px-1.5 py-0.5 rounded">${phase.status}</span></div>
+                        <div class="col-span-1 text-center font-medium">${phase.percent}</div>
+                        <div class="col-span-1 text-right font-mono ${effColorP}">${phase.efficiency}</div>
+                        <div class="col-span-1 text-left pl-2 truncate text-[10px] text-slate-600" title="${phase.area}">${phase.area}</div>
+                    </div>
+                `;
+
+                chartHTML += `
+                    <div class="h-10 flex items-center px-2 relative border-b border-slate-100 bg-indigo-50/30">
+                        <div onclick="openTaskModal('${phase.id}')" class="absolute h-4 rounded-md ${phase.color} opacity-85 flex items-center px-2 text-[10px] text-white font-medium shadow-sm cursor-pointer hover:opacity-100 hover:scale-[1.01] transition-all"
+                             style="left: ${phase.offset * 8}px; width: ${phase.width * 8}px;" title="Editar: ${phase.name}">
+                            <span class="truncate">${phase.name}</span>
+                        </div>
+                    </div>
+                `;
+
+                if (isExpanded && phase.children) {
+                    phase.children.forEach(child => {
+                        const varColor = (child.variance && child.variance.startsWith("-")) ? "text-rose-600 font-semibold" : "text-emerald-600";
+                        const effColor = (child.efficiency && child.efficiency.startsWith("-")) ? "text-rose-600" : "text-emerald-600";
+                        const isSub = child.type === 'subtask';
+                        const indentClass = isSub ? "pl-7 text-slate-600" : "pl-4 text-slate-700 font-medium";
+
+                        tableHTML += `
+                            <div class="grid grid-cols-12 px-3 py-2 hover:bg-slate-50 border-b border-slate-100 items-center transition text-[11px]">
+                                <div class="col-span-3 flex items-center space-x-1.5 ${indentClass} truncate">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 inline-block"></span>
+                                    <span class="truncate" title="${child.name}">${child.name}</span>
+                                </div>
+                                <div class="col-span-2 text-slate-500 truncate text-[10px]" title="${child.assignee}">${child.assignee}</div>
+                                <div class="col-span-1 text-right font-mono text-slate-600">${child.budget}</div>
+                                <div class="col-span-1 text-right font-mono text-slate-600">${child.actualCost}</div>
+                                <div class="col-span-1 text-right font-mono ${varColor}">${child.variance}</div>
+                                <div class="col-span-1 text-center"><span class="bg-slate-100 text-slate-700 text-[9px] px-1.5 py-0.5 rounded">${child.status}</span></div>
+                                <div class="col-span-1 text-center text-slate-600">${child.percent}</div>
+                                <div class="col-span-1 text-right font-mono ${effColor}">${child.efficiency}</div>
+                                <div class="col-span-1 text-left pl-2 truncate text-[10px] text-slate-500" title="${child.area}">${child.area}</div>
+                            </div>
+                        `;
+
+                        chartHTML += `
+                            <div class="h-9 flex items-center px-2 relative border-b border-slate-100 hover:bg-slate-50/80 transition">
+                                <div onclick="openTaskModal('${child.id}')" class="absolute h-3.5 rounded ${child.color} opacity-90 flex items-center px-1.5 text-[9px] text-white shadow-xs cursor-pointer hover:scale-[1.01] transition-all"
+                                     style="left: ${child.offset * 8}px; width: ${child.width * 8}px;" title="Editar: ${child.name}">
+                                    <span class="truncate">${child.name}</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            });
+
+            tableBody.innerHTML = tableHTML;
+            chartBody.innerHTML = chartHTML;
+        }
+
+        // Smartsheet Task Modal Logic
+        let activeTaskId = null;
+
+        function openTaskModal(taskId) {
+            activeTaskId = taskId;
+            let taskObj = null;
+
+            // Search in projectData
+            projectData.forEach(phase => {
+                if (phase.id === taskId) taskObj = phase;
+                if (phase.children) {
+                    phase.children.forEach(child => {
+                        if (child.id === taskId) taskObj = child;
+                    });
+                }
+            });
+
+            if (!taskObj) return;
+
+            // Populate form fields
+            document.getElementById("modalTaskRowId").textContent = `ID: ${taskObj.id}`;
+            document.getElementById("modalTaskName").value = taskObj.name || "";
+            document.getElementById("modalTaskAssignee").value = taskObj.assignee || "";
+            document.getElementById("modalTaskBudget").value = taskObj.budget || "";
+            document.getElementById("modalTaskCost").value = taskObj.actualCost || "";
+            document.getElementById("modalTaskDuration").value = taskObj.duration || "";
+            document.getElementById("modalTaskPercent").value = taskObj.percent || "";
+            document.getElementById("modalTaskStatus").value = taskObj.status || "In Progress";
+            document.getElementById("modalTaskArea").value = taskObj.area || "";
+
+            document.getElementById("taskModal").classList.remove("hidden");
+        }
+
+        function closeTaskModal() {
+            document.getElementById("taskModal").classList.add("hidden");
+            activeTaskId = null;
+        }
+
+        function saveTaskModal() {
+            if (!activeTaskId) return;
+
+            projectData.forEach(phase => {
+                if (phase.id === activeTaskId) {
+                    phase.name = document.getElementById("modalTaskName").value;
+                    phase.assignee = document.getElementById("modalTaskAssignee").value;
+                    phase.budget = document.getElementById("modalTaskBudget").value;
+                    phase.actualCost = document.getElementById("modalTaskCost").value;
+                    phase.duration = document.getElementById("modalTaskDuration").value;
+                    phase.percent = document.getElementById("modalTaskPercent").value;
+                    phase.status = document.getElementById("modalTaskStatus").value;
+                    phase.area = document.getElementById("modalTaskArea").value;
+                }
+                if (phase.children) {
+                    phase.children.forEach(child => {
+                        if (child.id === activeTaskId) {
+                            child.name = document.getElementById("modalTaskName").value;
+                            child.assignee = document.getElementById("modalTaskAssignee").value;
+                            child.budget = document.getElementById("modalTaskBudget").value;
+                            child.actualCost = document.getElementById("modalTaskCost").value;
+                            child.duration = document.getElementById("modalTaskDuration").value;
+                            child.percent = document.getElementById("modalTaskPercent").value;
+                            child.status = document.getElementById("modalTaskStatus").value;
+                            child.area = document.getElementById("modalTaskArea").value;
+                        }
+                    });
+                }
+            });
+
+            renderGantt();
+            closeTaskModal();
+        }
+
+        function addComment() {
+            const input = document.getElementById("newCommentInput");
+            const text = input.value.trim();
+            if (!text) return;
+
+            const list = document.getElementById("commentList");
+            const commentHTML = `
+                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
+                    <div class="flex items-center space-x-2 mb-1">
+                        <span class="w-5 h-5 bg-indigo-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">U</span>
+                        <span class="font-semibold text-slate-700">Usuario Actual</span>
+                        <span class="text-[10px] text-slate-400 ml-auto">Hace un momento</span>
+                    </div>
+                    <p class="text-slate-600">${text}</p>
+                </div>
+            `;
+            list.insertAdjacentHTML('afterbegin', commentHTML);
+            input.value = "";
+        }
+
+        // Excel Export Function using SheetJS
+        function exportToExcel() {
+            let flatData = [];
+            projectData.forEach(phase => {
+                flatData.push({
+                    "Tasks": phase.name,
+                    "Assigned To": phase.assignee,
+                    "Budget": phase.budget,
+                    "Actual Cost": phase.actualCost,
+                    "Budget Variance": phase.variance,
+                    "Duration": phase.duration,
+                    "Status": phase.status,
+                    "% Completado": phase.percent,
+                    "Eficiencia": phase.efficiency,
+                    "AREA": phase.area
+                });
+                if (phase.children) {
+                    phase.children.forEach(child => {
+                        flatData.push({
+                            "Tasks": "   " + child.name,
+                            "Assigned To": child.assignee,
+                            "Budget": child.budget,
+                            "Actual Cost": child.actualCost,
+                            "Budget Variance": child.variance,
+                            "Duration": child.duration,
+                            "Status": child.status,
+                            "% Completado": child.percent,
+                            "Eficiencia": child.efficiency,
+                            "AREA": child.area
+                        });
+                    });
+                }
+            });
+
+            const worksheet = XLSX.utils.json_to_sheet(flatData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Hoja de tareas");
+            XLSX.writeFile(workbook, "Proyecto_Alicorp_Exportado.xlsx");
+        }
+
+        // Excel Import Function with parser & UI update
+        function importFromExcel(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const json = XLSX.utils.sheet_to_json(worksheet);
+
+                    if (json && json.length > 0) {
+                        let newPhases = [];
+                        let currentPhase = null;
+
+                        json.forEach((row, idx) => {
+                            const taskName = (row["Tasks"] || row["Tarea"] || row["Nombre"] || `Fase / Tarea ${idx}`).toString();
+                            const isPhase = !taskName.startsWith("   ") && (taskName.includes("FASE") || !currentPhase);
+
+                            const item = {
+                                id: `imp_${idx}`,
+                                type: isPhase ? "phase" : "task",
+                                name: taskName.trim(),
+                                assignee: row["Assigned To"] || row["Responsable"] || "Sin asignar",
+                                budget: row["Budget"] || row["Presupuesto"] ? (typeof row["Budget"] === 'number' ? `$${row["Budget"].toLocaleString('en-US', {minimumFractionDigits: 2})}` : row["Budget"]) : "$0.00",
+                                actualCost: row["Actual Cost"] || row["Costo Real"] ? (typeof row["Actual Cost"] === 'number' ? `$${row["Actual Cost"].toLocaleString('en-US', {minimumFractionDigits: 2})}` : row["Actual Cost"]) : "$0.00",
+                                variance: row["Budget Variance"] || row["Variación"] || "$0.00",
+                                duration: row["Duration"] || row["Duración"] || "5d",
+                                status: row["Status"] || row["Estado"] || "In Progress",
+                                percent: row["% Completado"] ? (typeof row["% Completado"] === 'number' ? `${(row["% Completado"] * 100).toFixed(0)}%` : row["% Completado"]) : "0.00%",
+                                efficiency: row["Efficiency"] || row["Eficiencia"] || "0.00%",
+                                area: row["AREA"] || row["Área"] || "CONTABILIDAD",
+                                offset: idx * 3,
+                                width: 6,
+                                color: isPhase ? "bg-indigo-600" : "bg-sky-500",
+                                children: []
+                            };
+
+                            if (isPhase || !currentPhase) {
+                                currentPhase = item;
+                                newPhases.push(currentPhase);
+                            } else {
+                                currentPhase.children.push(item);
+                            }
+                        });
+
+                        if (newPhases.length > 0) {
+                            projectData = newPhases;
+                            expandedPhases = {};
+                            projectData.forEach(p => expandedPhases[p.id] = true);
+                            renderGantt();
+                            alert(`¡Archivo Excel "${file.name}" importado y renderizado exitosamente (${json.length} filas procesadas)!`);
+                        }
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert("Error al procesar el archivo Excel. Asegúrate de que tenga las columnas correctas.");
+                }
+                event.target.value = '';
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Calculate Total Actual Cost from currently loaded projectData
+        function calculateTotalActualCost() {
+            let total = 0;
+            projectData.forEach(phase => {
+                if (phase.actualCost) {
+                    let val = parseFloat(phase.actualCost.toString().replace(/[^0-9.-]+/g,"")) || 0;
+                    total += val;
+                }
+                if (phase.children) {
+                    phase.children.forEach(child => {
+                        let val = parseFloat((child.actualCost || child.budget || "0").toString().replace(/[^0-9.-]+/g,"")) || 0;
+                        total += val;
+                    });
+                }
+            });
+            return total > 0 ? total : 120000;
+        }
+
+        // Financial Calculations & Modal Logic (Dynamic based on loaded Excel data)
+        function openFinancialModal() {
+            document.getElementById("financialModal").classList.remove("hidden");
+            const totalCost = calculateTotalActualCost();
+            document.getElementById("inputInitialInv").value = totalCost.toFixed(2);
+            calculateFinancials();
+        }
+
+        function closeFinancialModal() {
+            document.getElementById("financialModal").classList.add("hidden");
+        }
+
+        function resetDefaults() {
+            const totalCost = calculateTotalActualCost();
+            document.getElementById("inputInitialInv").value = totalCost.toFixed(2);
+            document.getElementById("inputDiscountRate").value = 12;
+            calculateFinancials();
+        }
+
+        function calculateFinancials() {
+            const D0 = parseFloat(document.getElementById("inputInitialInv").value) || calculateTotalActualCost();
+            const k = (parseFloat(document.getElementById("inputDiscountRate").value) || 0) / 100;
+
+            const cashFlows = [
+                { year: 1, fc: D0 * 0.35 },
+                { year: 2, fc: D0 * 0.45 },
+                { year: 3, fc: D0 * 0.55 },
+                { year: 4, fc: D0 * 0.65 },
+                { year: 5, fc: D0 * 0.75 }
+            ];
+
+            let VAN = -D0;
+            let discountedSum = 0;
+            let cumulative = -D0;
+            let tableHTML = "";
+
+            const fmtD0 = D0.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            tableHTML += `
+                <tr class="bg-slate-50 font-semibold">
+                    <td class="px-4 py-2.5">Año 0 (Inversión Inicial)</td>
+                    <td class="px-4 py-2.5 text-right text-rose-600 font-mono">-$${fmtD0}</td>
+                    <td class="px-4 py-2.5 text-right font-mono">-$${fmtD0}</td>
+                    <td class="px-4 py-2.5 text-right font-mono text-rose-600">-$${fmtD0}</td>
+                </tr>
+            `;
+
+            cashFlows.forEach(item => {
+                const discounted = item.fc / Math.pow(1 + k, item.year);
+                discountedSum += discounted;
+                cumulative += item.fc;
+
+                const fmtFc = item.fc.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                const fmtDisc = discounted.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                const fmtCum = cumulative.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+                tableHTML += `
+                    <tr>
+                        <td class="px-4 py-2.5">Año ${item.year}</td>
+                        <td class="px-4 py-2.5 text-right text-emerald-600 font-mono">+$${fmtFc}</td>
+                        <td class="px-4 py-2.5 text-right font-mono">$${fmtDisc}</td>
+                        <td class="px-4 py-2.5 text-right font-mono">$${fmtCum}</td>
+                    </tr>
+                `;
+            });
+
+            VAN = -D0 + discountedSum;
+            const BC_Ratio = D0 > 0 ? (discountedSum / D0).toFixed(2) : 0;
+
+            let tir = 0.15;
+            for (let iter = 0; iter < 100; iter++) {
+                let npv = -D0;
+                let dNpv = 0;
+                cashFlows.forEach(item => {
+                    npv += item.fc / Math.pow(1 + tir, item.year);
+                    dNpv -= item.year * item.fc / Math.pow(1 + tir, item.year + 1);
+                });
+                if (Math.abs(npv) < 1e-5) break;
+                if (dNpv === 0) break;
+                tir = tir - npv / dNpv;
+            }
+            const TIR_pct = (tir * 100).toFixed(2);
+
+            let paybackMonths = 0;
+            let runningSum = D0;
+            for (let i = 0; i < cashFlows.length; i++) {
+                if (runningSum <= cashFlows[i].fc) {
+                    paybackMonths = (i + (runningSum / cashFlows[i].fc)) * 12;
+                    break;
+                }
+                runningSum -= cashFlows[i].fc;
+            }
+            if (paybackMonths === 0) paybackMonths = 60;
+
+            const fmtVAN = VAN.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            const valVanEl = document.getElementById("valVan");
+            valVanEl.textContent = `$${fmtVAN}`;
+            valVanEl.className = VAN >= 0 ? "text-2xl font-black text-emerald-600" : "text-2xl font-black text-rose-600";
+
+            const badgeVan = document.getElementById("badgeVan");
+            badgeVan.textContent = VAN >= 0 ? "Rentable" : "No Rentable";
+            badgeVan.className = VAN >= 0 ? "text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold" : "text-[10px] bg-rose-100 text-rose-800 px-2 py-0.5 rounded-full font-bold";
+
+            const valTirEl = document.getElementById("valTir");
+            valTirEl.textContent = `${TIR_pct}%`;
+            valTirEl.className = tir >= k ? "text-2xl font-black text-emerald-600" : "text-2xl font-black text-rose-600";
+
+            const badgeTir = document.getElementById("badgeTir");
+            badgeTir.textContent = tir >= k ? "Superior a k" : "Inferior a k";
+            badgeTir.className = tir >= k ? "text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold" : "text-[10px] bg-rose-100 text-rose-800 px-2 py-0.5 rounded-full font-bold";
+
+            const valBCEl = document.getElementById("valBC");
+            valBCEl.textContent = BC_Ratio;
+
+            const badgeBC = document.getElementById("badgeBC");
+            badgeBC.textContent = BC_Ratio >= 1 ? "Viable" : "No Viable";
+            badgeBC.className = BC_Ratio >= 1 ? "text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold" : "text-[10px] bg-rose-100 text-rose-800 px-2 py-0.5 rounded-full font-bold";
+
+            document.getElementById("valPayback").textContent = `${paybackMonths.toFixed(1)} Meses`;
+            document.getElementById("cashFlowTableBody").innerHTML = tableHTML;
+        }
+
+        renderGantt();
+    </script>
+</body>
+</html>
