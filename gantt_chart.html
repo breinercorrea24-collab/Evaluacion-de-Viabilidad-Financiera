@@ -3,79 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proyecto de Transformación Tecnológica - Alicorp | Smartsheet Pro (Gantt 100% Ancho Completo)</title>
+    <title>Proyecto de Transformación Tecnológica - Alicorp | Smartsheet Pro (Responsive Mobile & Desktop)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- SheetJS (xlsx) for Excel Export & Import -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
         }
         ::-webkit-scrollbar-track {
             background: #f1f5f9;
         }
         ::-webkit-scrollbar-thumb {
             background: #cbd5e1;
-            border-radius: 4px;
+            border-radius: 3px;
         }
         ::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
         .gantt-grid {
-            background-size: 50px 100%;
+            background-size: 40px 100%;
             background-image: linear-gradient(to right, #cbd5e1 1px, transparent 1px);
         }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
 
-    <!-- Top Navigation Bar -->
-    <header class="bg-slate-900 text-white shadow-md px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-        <div>
-            <div class="flex items-center space-x-3">
-                <span class="bg-rose-600 text-xs uppercase px-2.5 py-1 rounded font-semibold tracking-wider">Smartsheet Pro</span>
-                <h1 class="text-xl font-bold tracking-tight">Proyecto de Transformación Tecnológica - Alicorp</h1>
+    <!-- Top Navigation Bar (Responsive) -->
+    <header class="bg-slate-900 text-white shadow-md px-4 sm:px-6 py-3.5 flex flex-col lg:flex-row justify-between items-center gap-3">
+        <div class="text-center lg:text-left">
+            <div class="flex items-center justify-center lg:justify-start space-x-2.5 flex-wrap">
+                <span class="bg-rose-600 text-[10px] uppercase px-2 py-0.5 rounded font-bold tracking-wider">Smartsheet Pro</span>
+                <h1 class="text-sm sm:text-base lg:text-lg font-bold tracking-tight">Transformación Tecnológica - Alicorp</h1>
             </div>
-            <p class="text-slate-400 text-xs mt-1">Control Financiero, Gantt con Ruta Crítica, Predecesores y Pantalla Completa</p>
+            <p class="text-slate-400 text-[11px] mt-0.5">Control Financiero, Gantt con Ruta Crítica y Vista Móvil Optimizada</p>
         </div>
-        <div class="flex items-center space-x-2.5 flex-wrap">
+        <div class="flex items-center space-x-2 flex-wrap justify-center">
             <!-- Fullscreen Gantt Button -->
-            <button onclick="openFullscreenGantt()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow-md transition flex items-center space-x-1.5">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
-                <span>🔍 Gantt Pantalla Completa</span>
+            <button onclick="openFullscreenGantt()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-sm transition flex items-center space-x-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                <span class="hidden sm:inline">Pantalla Completa</span>
+                <span class="sm:hidden">Gantt</span>
             </button>
 
             <!-- Financial Dashboard Button -->
-            <button onclick="openFinancialModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow-md transition flex items-center space-x-1.5">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <span>📊 VAN & TIR (Dinámico)</span>
+            <button onclick="openFinancialModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-sm transition flex items-center space-x-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>VAN & TIR</span>
             </button>
 
             <!-- Export to Excel Button -->
-            <button onclick="exportToExcel()" class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow-md transition flex items-center space-x-1.5">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                <span>📤 Exportar Excel</span>
+            <button onclick="exportToExcel()" class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-sm transition flex items-center space-x-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                <span class="hidden sm:inline">Exportar</span>
             </button>
 
             <!-- Import from Excel Button -->
-            <label class="bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow-md transition cursor-pointer flex items-center space-x-1.5">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                <span>📥 Importar Excel</span>
+            <label class="bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-sm transition cursor-pointer flex items-center space-x-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                <span class="hidden sm:inline">Importar</span>
                 <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" onchange="importFromExcel(event)" class="hidden">
             </label>
 
-            <button onclick="expandAll()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-2.5 py-2 rounded border border-slate-700 transition">Expandir</button>
-            <button onclick="collapseAll()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-2.5 py-2 rounded border border-slate-700 transition">Contraer</button>
+            <button onclick="expandAll()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-2.5 py-2 rounded transition hidden sm:inline-block">Expandir</button>
+            <button onclick="collapseAll()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-2.5 py-2 rounded transition hidden sm:inline-block">Contraer</button>
         </div>
     </header>
 
-    <!-- Main Workspace Container (Split Pane) -->
-    <main class="flex-1 flex overflow-hidden border-t border-slate-200">
+    <!-- Mobile View Switcher Tabs (Only visible on small screens < md) -->
+    <div class="md:hidden bg-slate-200 p-1.5 flex justify-center space-x-2 border-b border-slate-300">
+        <button id="mobileTabTable" onclick="switchMobileTab('table')" class="flex-1 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-md shadow-xs transition">📋 Ver Tabla</button>
+        <button id="mobileTabGantt" onclick="switchMobileTab('gantt')" class="flex-1 py-1.5 bg-white text-slate-700 text-xs font-bold rounded-md shadow-xs transition">📊 Ver Gantt</button>
+    </div>
 
-        <!-- Left Pane: Tasks Table with Predecessors Column -->
-        <div class="w-full md:w-7/12 xl:w-7/12 bg-white border-r border-slate-200 flex flex-col shadow-sm z-10 overflow-x-auto">
+    <!-- Main Workspace Container (Responsive Split / Tabbed Pane) -->
+    <main class="flex-1 flex overflow-hidden border-t border-slate-200 relative">
+
+        <!-- Left Pane: Tasks Table -->
+        <div id="paneTable" class="w-full md:w-7/12 xl:w-7/12 bg-white border-r border-slate-200 flex flex-col shadow-sm z-10 overflow-x-auto">
             <div class="min-w-[1150px]">
                 <!-- Table Header -->
                 <div class="bg-slate-100 border-b border-slate-200 px-3 py-2.5 grid grid-cols-12 text-[11px] font-bold text-slate-600 uppercase tracking-wider items-center">
@@ -96,8 +103,8 @@
             </div>
         </div>
 
-        <!-- Right Pane: Gantt Chart Timeline with SVG Dependencies -->
-        <div class="hidden md:flex flex-1 flex-col bg-slate-50 overflow-x-auto relative">
+        <!-- Right Pane: Gantt Chart Timeline -->
+        <div id="paneGantt" class="hidden md:flex flex-1 flex-col bg-slate-50 overflow-x-auto relative">
             <!-- Timeline Months & Days Header -->
             <div class="bg-white border-b border-slate-200 sticky top-0 z-30 flex flex-col min-w-[800px]">
                 <!-- Months -->
@@ -131,54 +138,51 @@
     <!-- Fullscreen Gantt Modal (100% Pure Gantt Timeline View) -->
     <div id="fullscreenGanttModal" class="fixed inset-0 w-screen h-screen m-0 p-0 bg-slate-950 z-50 hidden flex flex-col">
         <!-- Fullscreen Header -->
-        <div class="bg-slate-900 text-white px-6 py-4 flex justify-between items-center border-b border-slate-800 shrink-0">
-            <div class="flex items-center space-x-3">
-                <span class="bg-rose-600 text-xs uppercase px-2.5 py-1 rounded font-semibold tracking-wider">Pantalla Completa 100%</span>
-                <h2 class="text-lg font-bold">Diagrama de Gantt - Vista Ampliada de Cronograma y Dependencias</h2>
+        <div class="bg-slate-900 text-white px-4 sm:px-6 py-3.5 flex justify-between items-center border-b border-slate-800 shrink-0">
+            <div class="flex items-center space-x-2.5">
+                <span class="bg-rose-600 text-[10px] uppercase px-2 py-0.5 rounded font-bold tracking-wider">Pantalla Completa</span>
+                <h2 class="text-sm sm:text-base font-bold">Diagrama de Gantt - Vista Ampliada 100%</h2>
             </div>
-            <button onclick="closeFullscreenGantt()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center space-x-2">
+            <button onclick="closeFullscreenGantt()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center space-x-1.5">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                <span>Cerrar Pantalla Completa</span>
+                <span>Cerrar</span>
             </button>
         </div>
-        <!-- Fullscreen Timeline Body (100% Width Timeline) -->
+        <!-- Fullscreen Timeline Body -->
         <div class="flex-1 flex flex-col bg-slate-50 overflow-x-auto relative w-full h-full">
-            <!-- Timeline Months Header -->
-            <div class="bg-white border-b border-slate-200 sticky top-0 z-30 flex flex-col min-w-[1400px]">
+            <div class="bg-white border-b border-slate-200 sticky top-0 z-30 flex flex-col min-w-[1200px]">
                 <div class="flex border-b border-slate-200 text-xs font-bold text-slate-700 bg-slate-100">
-                    <div class="w-72 border-r border-slate-200 px-3 py-2 text-center">Octubre 2026</div>
-                    <div class="w-72 border-r border-slate-200 px-3 py-2 text-center">Noviembre 2026</div>
-                    <div class="w-72 border-r border-slate-200 px-3 py-2 text-center">Diciembre 2026</div>
-                    <div class="w-72 border-r border-slate-200 px-3 py-2 text-center">Enero 2027</div>
-                    <div class="w-72 px-3 py-2 text-center">Febrero 2027</div>
+                    <div class="w-64 border-r border-slate-200 px-3 py-2 text-center">Octubre 2026</div>
+                    <div class="w-64 border-r border-slate-200 px-3 py-2 text-center">Noviembre 2026</div>
+                    <div class="w-64 border-r border-slate-200 px-3 py-2 text-center">Diciembre 2026</div>
+                    <div class="w-64 border-r border-slate-200 px-3 py-2 text-center">Enero 2027</div>
+                    <div class="w-64 px-3 py-2 text-center">Febrero 2027</div>
                 </div>
-                <div class="flex text-[10px] text-slate-500 bg-slate-50 h-8 items-center">
-                    <div class="w-72 border-r border-slate-200 px-4 flex justify-between"><span>Sem 1 (Oct 4)</span><span>Sem 2 (Oct 11)</span><span>Sem 3 (Oct 18)</span><span>Sem 4 (Oct 25)</span></div>
-                    <div class="w-72 border-r border-slate-200 px-4 flex justify-between"><span>Sem 5 (Nov 1)</span><span>Sem 6 (Nov 8)</span><span>Sem 7 (Nov 15)</span><span>Sem 8 (Nov 22)</span></div>
-                    <div class="w-72 border-r border-slate-200 px-4 flex justify-between"><span>Sem 9 (Dic 6)</span><span>Sem 10 (Dic 13)</span><span>Sem 11 (Dic 20)</span><span>Sem 12 (Dic 27)</span></div>
-                    <div class="w-72 border-r border-slate-200 px-4 flex justify-between"><span>Sem 13 (Ene 3)</span><span>Sem 14 (Ene 10)</span><span>Sem 15 (Ene 17)</span><span>Sem 16 (Ene 24)</span></div>
-                    <div class="w-72 px-4 flex justify-between"><span>Sem 17 (Feb 7)</span><span>Sem 18 (Feb 14)</span><span>Sem 19 (Feb 21)</span><span>Sem 20 (Feb 28)</span></div>
+                <div class="flex text-[10px] text-slate-500 bg-slate-50 h-7 items-center">
+                    <div class="w-64 border-r border-slate-200 px-3 flex justify-between"><span>Sem 1</span><span>Sem 2</span><span>Sem 3</span><span>Sem 4</span></div>
+                    <div class="w-64 border-r border-slate-200 px-3 flex justify-between"><span>Sem 5</span><span>Sem 6</span><span>Sem 7</span><span>Sem 8</span></div>
+                    <div class="w-64 border-r border-slate-200 px-3 flex justify-between"><span>Sem 9</span><span>Sem 10</span><span>Sem 11</span><span>Sem 12</span></div>
+                    <div class="w-64 border-r border-slate-200 px-3 flex justify-between"><span>Sem 13</span><span>Sem 14</span><span>Sem 15</span><span>Sem 16</span></div>
+                    <div class="w-64 px-3 flex justify-between"><span>Sem 17</span><span>Sem 18</span><span>Sem 19</span><span>Sem 20</span></div>
                 </div>
             </div>
-            <!-- Timeline Chart Body with SVG Overlay -->
-            <div class="flex-1 overflow-y-auto relative gantt-grid min-w-[1400px] bg-slate-50/50">
+            <div class="flex-1 overflow-y-auto relative gantt-grid min-w-[1200px] bg-slate-50/50">
                 <svg id="fsGanttSvgOverlay" class="absolute inset-0 w-full h-full pointer-events-none z-20" style="min-height: 100%;"></svg>
                 <div id="fsGanttChartBody" class="divide-y divide-slate-100 relative z-10"></div>
             </div>
         </div>
     </div>
 
-    <!-- Smartsheet Task Detail & Edit Modal -->
-    <div id="taskModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in duration-200">
+    <!-- Smartsheet Task Detail & Edit Modal (Responsive) -->
+    <div id="taskModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-2 sm:p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[95vh] flex flex-col lg:flex-row overflow-hidden animate-in fade-in zoom-in duration-200">
 
-            <!-- Left Side: Task Edit Form (Smartsheet Style) -->
-            <div class="flex-1 p-6 overflow-y-auto border-r border-slate-200 flex flex-col justify-between">
+            <!-- Left Side: Task Edit Form -->
+            <div class="flex-1 p-4 sm:p-6 overflow-y-auto border-r border-slate-200 flex flex-col justify-between">
                 <div>
-                    <!-- Header -->
-                    <div class="flex justify-between items-center pb-4 border-b border-slate-200 mb-4">
+                    <div class="flex justify-between items-center pb-3 border-b border-slate-200 mb-3">
                         <div class="flex items-center space-x-2">
-                            <span class="bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded font-bold">Editar Tarea</span>
+                            <span class="bg-indigo-100 text-indigo-800 text-xs px-2 py-0.5 rounded font-bold">Editar Tarea</span>
                             <span id="modalTaskRowId" class="text-xs text-slate-400 font-mono">ID: --</span>
                         </div>
                         <button onclick="closeTaskModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition">
@@ -186,8 +190,7 @@
                         </button>
                     </div>
 
-                    <!-- Form Inputs -->
-                    <div class="space-y-4 text-xs">
+                    <div class="space-y-3 text-xs">
                         <div>
                             <label class="block font-semibold text-slate-600 mb-1">Tasks (Nombre)</label>
                             <input type="text" id="modalTaskName" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none">
@@ -196,7 +199,7 @@
                             <label class="block font-semibold text-slate-600 mb-1">Assigned To (Responsable)</label>
                             <input type="text" id="modalTaskAssignee" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                         </div>
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                                 <label class="block font-semibold text-slate-600 mb-1">Budget ($)</label>
                                 <input type="text" id="modalTaskBudget" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
@@ -206,7 +209,7 @@
                                 <input type="text" id="modalTaskCost" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                             </div>
                         </div>
-                        <div class="grid grid-cols-3 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div>
                                 <label class="block font-semibold text-slate-600 mb-1">Duration</label>
                                 <input type="text" id="modalTaskDuration" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
@@ -220,7 +223,7 @@
                                 <input type="text" id="modalTaskPercent" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                                 <label class="block font-semibold text-slate-600 mb-1">Status</label>
                                 <select id="modalTaskStatus" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
@@ -239,42 +242,40 @@
                     </div>
                 </div>
 
-                <!-- Form Footer Actions -->
-                <div class="pt-4 border-t border-slate-200 mt-6 flex justify-end space-x-2">
+                <div class="pt-3 border-t border-slate-200 mt-4 flex justify-end space-x-2">
                     <button onclick="closeTaskModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-4 py-2 rounded-lg transition">Cancelar</button>
                     <button onclick="saveTaskModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-5 py-2 rounded-lg shadow-sm transition">Aceptar</button>
                 </div>
             </div>
 
-            <!-- Right Side: Smartsheet Conversations / Comments Panel -->
-            <div class="w-full md:w-5/12 bg-slate-50 p-6 flex flex-col justify-between">
+            <!-- Right Side: Smartsheet Conversations Panel -->
+            <div class="w-full lg:w-5/12 bg-slate-50 p-4 sm:p-6 flex flex-col justify-between">
                 <div>
-                    <div class="text-center pb-4 border-b border-slate-200">
-                        <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                    <div class="text-center pb-3 border-b border-slate-200">
+                        <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-1.5">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
                         </div>
-                        <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Conversaciones en el contexto de su trabajo</h3>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Empiece por introducir el primer comentario a continuación.</p>
+                        <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Conversaciones</h3>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Comentarios en el contexto de la tarea.</p>
                     </div>
 
-                    <div id="commentList" class="my-4 space-y-3 overflow-y-auto max-h-48 text-xs">
-                        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
+                    <div id="commentList" class="my-3 space-y-2.5 overflow-y-auto max-h-40 text-xs">
+                        <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-xs">
                             <div class="flex items-center space-x-2 mb-1">
-                                <span class="w-5 h-5 bg-emerald-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">Y</span>
-                                <span class="font-semibold text-slate-700">Yeslit Rosié</span>
-                                <span class="text-[10px] text-slate-400 ml-auto">Hace 2 horas</span>
+                                <span class="w-4 h-4 bg-emerald-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">Y</span>
+                                <span class="font-semibold text-slate-700 text-[11px]">Yeslit Rosié</span>
+                                <span class="text-[9px] text-slate-400 ml-auto">Hace 2 horas</span>
                             </div>
-                            <p class="text-slate-600">Revisión de avances y entregables completados para esta tarea.</p>
+                            <p class="text-slate-600 text-[11px]">Revisión de avances para esta tarea.</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Comment Input -->
                 <div class="border-t border-slate-200 pt-3">
-                    <div class="flex items-center space-x-2 bg-white border border-slate-300 rounded-lg p-2 shadow-xs">
-                        <input type="text" id="newCommentInput" placeholder="Comentar o notificar a otras personas con @" class="flex-1 text-xs focus:outline-none">
+                    <div class="flex items-center space-x-2 bg-white border border-slate-300 rounded-lg p-1.5 shadow-xs">
+                        <input type="text" id="newCommentInput" placeholder="Comentar con @" class="flex-1 text-xs focus:outline-none">
                         <button onclick="addComment()" class="bg-indigo-600 hover:bg-indigo-500 text-white p-1.5 rounded-md transition">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                         </button>
                     </div>
                 </div>
@@ -283,100 +284,100 @@
         </div>
     </div>
 
-    <!-- Financial Dashboard Modal (VAN & TIR) -->
-    <div id="financialModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+    <!-- Financial Dashboard Modal (Responsive) -->
+    <div id="financialModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-2 sm:p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[95vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
             <!-- Modal Header -->
-            <div class="bg-slate-900 text-white px-6 py-4 flex justify-between items-center">
-                <div class="flex items-center space-x-3">
-                    <div class="bg-emerald-600 p-2 rounded-lg">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <div class="bg-slate-900 text-white px-4 sm:px-6 py-3.5 flex justify-between items-center">
+                <div class="flex items-center space-x-2.5">
+                    <div class="bg-emerald-600 p-1.5 rounded-lg">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
                     <div>
-                        <h2 class="text-lg font-bold">Dashboard Financiero y Evaluación de Inversión (VAN & TIR) Dinámico</h2>
-                        <p class="text-xs text-slate-400">Calculado automáticamente desde los Costos y Presupuestos del Excel</p>
+                        <h2 class="text-sm sm:text-base font-bold">Dashboard Financiero y Evaluación (VAN & TIR)</h2>
+                        <p class="text-[11px] text-slate-400">Proyecto de Transformación Tecnológica - Alicorp</p>
                     </div>
                 </div>
                 <button onclick="closeFinancialModal()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
 
             <!-- Modal Content -->
-            <div class="p-6 overflow-y-auto space-y-6 bg-slate-50 flex-1">
-                <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200 grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div class="p-4 sm:p-6 overflow-y-auto space-y-4 bg-slate-50 flex-1">
+                <div class="bg-white p-3 sm:p-4 rounded-xl shadow-xs border border-slate-200 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Inversión Inicial ($) [D₀]</label>
-                        <input type="number" id="inputInitialInv" value="120000" onchange="calculateFinancials()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                        <input type="number" id="inputInitialInv" value="120000" onchange="calculateFinancials()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Tasa de Descuento / k (%)</label>
-                        <input type="number" id="inputDiscountRate" value="12" step="0.5" onchange="calculateFinancials()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                        <input type="number" id="inputDiscountRate" value="12" step="0.5" onchange="calculateFinancials()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Periodicidad</label>
-                        <select id="inputPeriodType" onchange="calculateFinancials()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                        <select id="inputPeriodType" onchange="calculateFinancials()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                             <option value="years">Años</option>
                             <option value="months" selected>Meses</option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Plazo (N Periodos)</label>
-                        <input type="number" id="inputProjectionPeriods" value="12" min="1" max="120" onchange="calculateFinancials()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                        <input type="number" id="inputProjectionPeriods" value="12" min="1" max="120" onchange="calculateFinancials()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                     </div>
                     <div class="flex items-end">
-                        <button onclick="resetDefaults()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 rounded-lg border border-slate-300 transition">Sincronizar</button>
+                        <button onclick="resetDefaults()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2 rounded-lg border border-slate-300 transition">Sincronizar</button>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200 flex flex-col justify-between">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div class="bg-white p-3 sm:p-4 rounded-xl shadow-xs border border-slate-200 flex flex-col justify-between">
                         <div class="flex justify-between items-start">
                             <span class="text-xs font-semibold text-slate-500">VAN (Valor Actual Neto)</span>
                             <span id="badgeVan" class="text-[10px] px-2 py-0.5 rounded-full font-bold"></span>
                         </div>
-                        <div class="my-3"><span id="valVan" class="text-2xl font-black text-slate-900">$0.00</span></div>
-                        <p class="text-[11px] text-slate-400">VAN > 0 (Proyecto Rentable)</p>
+                        <div class="my-2"><span id="valVan" class="text-xl sm:text-2xl font-black text-slate-900">$0.00</span></div>
+                        <p class="text-[10px] text-slate-400">VAN > 0 (Proyecto Rentable)</p>
                     </div>
-                    <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200 flex flex-col justify-between">
+                    <div class="bg-white p-3 sm:p-4 rounded-xl shadow-xs border border-slate-200 flex flex-col justify-between">
                         <div class="flex justify-between items-start">
                             <span class="text-xs font-semibold text-slate-500">TIR (Tasa Interna Retorno)</span>
                             <span id="badgeTir" class="text-[10px] px-2 py-0.5 rounded-full font-bold"></span>
                         </div>
-                        <div class="my-3"><span id="valTir" class="text-2xl font-black text-slate-900">0.00%</span></div>
-                        <p class="text-[11px] text-slate-400">Tasa de rendimiento interno</p>
+                        <div class="my-2"><span id="valTir" class="text-xl sm:text-2xl font-black text-slate-900">0.00%</span></div>
+                        <p class="text-[10px] text-slate-400">Tasa de rendimiento interno</p>
                     </div>
-                    <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200 flex flex-col justify-between">
+                    <div class="bg-white p-3 sm:p-4 rounded-xl shadow-xs border border-slate-200 flex flex-col justify-between">
                         <div class="flex justify-between items-start">
                             <span class="text-xs font-semibold text-slate-500">Relación Beneficio/Costo (B/C)</span>
                             <span id="badgeBC" class="text-[10px] px-2 py-0.5 rounded-full font-bold"></span>
                         </div>
-                        <div class="my-3"><span id="valBC" class="text-2xl font-black text-slate-900">0.00</span></div>
-                        <p class="text-[11px] text-slate-400">B/C > 1 (Viable)</p>
+                        <div class="my-2"><span id="valBC" class="text-xl sm:text-2xl font-black text-slate-900">0.00</span></div>
+                        <p class="text-[10px] text-slate-400">B/C > 1 (Viable)</p>
                     </div>
-                    <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200 flex flex-col justify-between">
+                    <div class="bg-white p-3 sm:p-4 rounded-xl shadow-xs border border-slate-200 flex flex-col justify-between">
                         <div class="flex justify-between items-start">
                             <span class="text-xs font-semibold text-slate-500">Periodo de Recuperación (Payback)</span>
                             <span class="text-[10px] bg-sky-100 text-sky-800 px-2 py-0.5 rounded-full font-bold">Plazo</span>
                         </div>
-                        <div class="my-3"><span id="valPayback" class="text-2xl font-black text-slate-900">0.0 Meses</span></div>
-                        <p class="text-[11px] text-slate-400">Recuperación de inversión</p>
+                        <div class="my-2"><span id="valPayback" class="text-xl sm:text-2xl font-black text-slate-900">0.0 Meses</span></div>
+                        <p class="text-[10px] text-slate-400">Recuperación de inversión</p>
                     </div>
                 </div>
 
                 <div class="bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden">
-                    <div class="bg-slate-100 px-4 py-3 border-b border-slate-200 flex justify-between items-center">
-                        <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Flujo de Caja Proyectado (FCⱼ) - Derivado de Costos y Presupuestos</h3>
+                    <div class="bg-slate-100 px-4 py-2.5 border-b border-slate-200 flex justify-between items-center">
+                        <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Flujo de Caja Proyectado (FCⱼ)</h3>
                         <span id="cashFlowSubtitle" class="text-xs text-slate-500">Periodos</span>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-xs text-left">
                             <thead class="bg-slate-50 text-slate-600 border-b border-slate-200 font-semibold">
                                 <tr>
-                                    <th class="px-4 py-2.5">Periodo</th>
-                                    <th class="px-4 py-2.5 text-right">Flujo de Caja (FCⱼ / $)</th>
-                                    <th class="px-4 py-2.5 text-right">Valor Actualizado / Descontado</th>
-                                    <th class="px-4 py-2.5 text-right">Flujo Acumulado</th>
+                                    <th class="px-4 py-2">Periodo</th>
+                                    <th class="px-4 py-2 text-right">Flujo de Caja (FCⱼ / $)</th>
+                                    <th class="px-4 py-2 text-right">Valor Actualizado / Descontado</th>
+                                    <th class="px-4 py-2 text-right">Flujo Acumulado</th>
                                 </tr>
                             </thead>
                             <tbody id="cashFlowTableBody" class="divide-y divide-slate-100"></tbody>
@@ -385,18 +386,17 @@
                 </div>
             </div>
             <div class="bg-white border-t border-slate-200 px-6 py-3 flex justify-end">
-                <button onclick="closeFinancialModal()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-5 py-2.5 rounded-lg transition">Cerrar Dashboard</button>
+                <button onclick="closeFinancialModal()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-5 py-2 rounded-lg transition">Cerrar Dashboard</button>
             </div>
         </div>
     </div>
 
     <!-- Footer Status -->
-    <footer class="bg-white border-t border-slate-200 px-6 py-2 text-xs text-slate-500 flex justify-between items-center">
+    <footer class="bg-white border-t border-slate-200 px-4 py-2 text-[11px] text-slate-500 flex flex-col sm:flex-row justify-between items-center gap-1">
         <div>Proyecto Enterprise - Módulo Contable, Financiero y de Control Interno</div>
-        <div class="flex items-center space-x-4">
-            <span class="flex items-center"><span class="w-3 h-3 bg-indigo-500 rounded-sm inline-block mr-1.5"></span> Fase / Resumen</span>
-            <span class="flex items-center"><span class="w-3 h-3 bg-sky-500 rounded-sm inline-block mr-1.5"></span> En Curso</span>
-            <span class="flex items-center"><span class="w-3 h-3 bg-rose-500 rounded-sm inline-block mr-1.5"></span> Riesgo / Alerta</span>
+        <div class="flex items-center space-x-3">
+            <span class="flex items-center"><span class="w-2.5 h-2.5 bg-rose-600 rounded-sm inline-block mr-1"></span> Crítica</span>
+            <span class="flex items-center"><span class="w-2.5 h-2.5 bg-sky-500 rounded-sm inline-block mr-1"></span> Normal</span>
         </div>
     </footer>
 
@@ -467,6 +467,26 @@
         function collapseAll() {
             Object.keys(expandedPhases).forEach(k => expandedPhases[k] = false);
             renderGantt();
+        }
+
+        function switchMobileTab(tab) {
+            const paneTable = document.getElementById("paneTable");
+            const paneGantt = document.getElementById("paneGantt");
+            const tabTable = document.getElementById("mobileTabTable");
+            const tabGantt = document.getElementById("mobileTabGantt");
+
+            if (tab === 'table') {
+                paneTable.classList.remove("hidden");
+                paneGantt.classList.add("hidden");
+                tabTable.className = "flex-1 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-md shadow-xs transition";
+                tabGantt.className = "flex-1 py-1.5 bg-white text-slate-700 text-xs font-bold rounded-md shadow-xs transition";
+            } else {
+                paneTable.classList.add("hidden");
+                paneGantt.classList.remove("hidden");
+                paneGantt.classList.add("flex");
+                tabGantt.className = "flex-1 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-md shadow-xs transition";
+                tabTable.className = "flex-1 py-1.5 bg-white text-slate-700 text-xs font-bold rounded-md shadow-xs transition";
+            }
         }
 
         function renderGantt() {
@@ -644,7 +664,7 @@
             `;
         }
 
-        // Fullscreen Gantt Modal Logic (100% Pure Gantt Timeline View)
+        // Fullscreen Gantt Modal Logic (100% Pure Gantt Timeline View - Full Width)
         function openFullscreenGantt() {
             document.getElementById("fullscreenGanttModal").classList.remove("hidden");
             renderFullscreenGantt();
@@ -668,15 +688,15 @@
                 const isExpanded = expandedPhases[phase.id];
 
                 const phaseY = (phaseRowNumber - 1) * 36 + 18;
-                const phaseX1 = phase.offset * 12; // wider scaling for full screen
-                const phaseX2 = phaseX1 + (phase.width * 12);
-                barCoordinates[phaseRowNumber] = { x1: phaseX1, x2: phaseX2, y: phaseY, isCritical: phase.isCritical };
+                const phaseX1 = phase.offset * 14; // wider scaling for full screen 100%
+                const phaseX2 = phaseX1 + (phase.width * 14);
+                barCoordinates[phaseRowNumber] = { x1: phaseX1 + 60, x2: phaseX2 + 60, y: phaseY, isCritical: phase.isCritical };
 
                 chartHTML += `
                     <div class="h-[36px] flex items-center px-4 relative border-b border-slate-200 bg-indigo-50/20">
-                        <span class="absolute left-2 text-[10px] font-bold text-slate-500 w-12">${phaseRowNumber}.</span>
+                        <span class="absolute left-3 text-[11px] font-bold text-slate-500 w-12">${phaseRowNumber}.</span>
                         <div class="absolute h-5 rounded-md ${phase.color} opacity-95 flex items-center px-3 text-[11px] text-white font-bold shadow-sm ${phase.isCritical ? 'ring-2 ring-rose-400' : ''}"
-                             style="left: ${phaseX1 + 50}px; width: ${phase.width * 12}px;" title="${phase.name}">
+                             style="left: ${phaseX1 + 60}px; width: ${phase.width * 14}px;" title="${phase.name}">
                             <span class="truncate">${phase.name}</span>
                         </div>
                     </div>
@@ -687,15 +707,15 @@
                         globalRowIdx++;
                         const childRowNumber = globalRowIdx;
                         const childY = (childRowNumber - 1) * 36 + 18;
-                        const childX1 = child.offset * 12;
-                        const childX2 = childX1 + (child.width * 12);
-                        barCoordinates[childRowNumber] = { x1: childX1 + 50, x2: childX2 + 50, y: childY, isCritical: child.isCritical };
+                        const childX1 = child.offset * 14;
+                        const childX2 = childX1 + (child.width * 14);
+                        barCoordinates[childRowNumber] = { x1: childX1 + 60, x2: childX2 + 60, y: childY, isCritical: child.isCritical };
 
                         chartHTML += `
                             <div class="h-[36px] flex items-center px-4 relative border-b border-slate-100 hover:bg-slate-100/60 transition">
-                                <span class="absolute left-2 text-[10px] text-slate-400 w-12">${childRowNumber}.</span>
+                                <span class="absolute left-3 text-[10px] text-slate-400 w-12">${childRowNumber}.</span>
                                 <div class="absolute h-4 rounded ${child.color} opacity-90 flex items-center px-2 text-[10px] text-white font-medium shadow-xs ${child.isCritical ? 'ring-2 ring-rose-400' : ''}"
-                                     style="left: ${childX1 + 50}px; width: ${child.width * 12}px;" title="${child.name}">
+                                     style="left: ${childX1 + 60}px; width: ${child.width * 14}px;" title="${child.name}">
                                     <span class="truncate">${child.name}</span>
                                 </div>
                             </div>
