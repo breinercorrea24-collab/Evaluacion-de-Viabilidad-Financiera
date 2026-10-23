@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proyecto de Transformación Tecnológica - Alicorp | Smartsheet, Excel & VAN/TIR Dinámico</title>
+    <title>Proyecto de Transformación Tecnológica - Alicorp | Smartsheet Pro (Gantt 100% Ancho Completo)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- SheetJS (xlsx) for Excel Export & Import -->
@@ -24,8 +24,8 @@
             background: #94a3b8;
         }
         .gantt-grid {
-            background-size: 40px 100%;
-            background-image: linear-gradient(to right, #e2e8f0 1px, transparent 1px);
+            background-size: 50px 100%;
+            background-image: linear-gradient(to right, #cbd5e1 1px, transparent 1px);
         }
     </style>
 </head>
@@ -35,12 +35,18 @@
     <header class="bg-slate-900 text-white shadow-md px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
         <div>
             <div class="flex items-center space-x-3">
-                <span class="bg-indigo-600 text-xs uppercase px-2.5 py-1 rounded font-semibold tracking-wider">Smartsheet Pro</span>
+                <span class="bg-rose-600 text-xs uppercase px-2.5 py-1 rounded font-semibold tracking-wider">Smartsheet Pro</span>
                 <h1 class="text-xl font-bold tracking-tight">Proyecto de Transformación Tecnológica - Alicorp</h1>
             </div>
-            <p class="text-slate-400 text-xs mt-1">Control Financiero, Gantt, VAN/TIR Dinámico (Años o Meses)</p>
+            <p class="text-slate-400 text-xs mt-1">Control Financiero, Gantt con Ruta Crítica, Predecesores y Pantalla Completa</p>
         </div>
         <div class="flex items-center space-x-2.5 flex-wrap">
+            <!-- Fullscreen Gantt Button -->
+            <button onclick="openFullscreenGantt()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow-md transition flex items-center space-x-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                <span>🔍 Gantt Pantalla Completa</span>
+            </button>
+
             <!-- Financial Dashboard Button -->
             <button onclick="openFinancialModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow-md transition flex items-center space-x-1.5">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -68,19 +74,19 @@
     <!-- Main Workspace Container (Split Pane) -->
     <main class="flex-1 flex overflow-hidden border-t border-slate-200">
 
-        <!-- Left Pane: Tasks Table with Extended Columns -->
+        <!-- Left Pane: Tasks Table with Predecessors Column -->
         <div class="w-full md:w-7/12 xl:w-7/12 bg-white border-r border-slate-200 flex flex-col shadow-sm z-10 overflow-x-auto">
-            <div class="min-w-[1100px]">
+            <div class="min-w-[1150px]">
                 <!-- Table Header -->
                 <div class="bg-slate-100 border-b border-slate-200 px-3 py-2.5 grid grid-cols-12 text-[11px] font-bold text-slate-600 uppercase tracking-wider items-center">
                     <div class="col-span-3">Tasks</div>
                     <div class="col-span-2">Assigned To</div>
                     <div class="col-span-1 text-right">Budget</div>
                     <div class="col-span-1 text-right">Actual Cost</div>
-                    <div class="col-span-1 text-right">Variance</div>
+                    <div class="col-span-1 text-center">Predec.</div>
                     <div class="col-span-1 text-center">Status</div>
                     <div class="col-span-1 text-center">% Comp.</div>
-                    <div class="col-span-1 text-right">Eficiencia</div>
+                    <div class="col-span-1 text-right">Eficienc.</div>
                     <div class="col-span-1 text-left pl-2">Área</div>
                 </div>
                 <!-- Table Body -->
@@ -90,10 +96,10 @@
             </div>
         </div>
 
-        <!-- Right Pane: Gantt Chart Timeline -->
-        <div class="hidden md:flex flex-1 flex-col bg-slate-50 overflow-x-auto">
+        <!-- Right Pane: Gantt Chart Timeline with SVG Dependencies -->
+        <div class="hidden md:flex flex-1 flex-col bg-slate-50 overflow-x-auto relative">
             <!-- Timeline Months & Days Header -->
-            <div class="bg-white border-b border-slate-200 sticky top-0 z-20 flex flex-col min-w-[800px]">
+            <div class="bg-white border-b border-slate-200 sticky top-0 z-30 flex flex-col min-w-[800px]">
                 <!-- Months -->
                 <div class="flex border-b border-slate-200 text-xs font-bold text-slate-700 bg-slate-100">
                     <div class="w-40 border-r border-slate-200 px-3 py-1.5 text-center">Octubre 2026</div>
@@ -111,13 +117,56 @@
                     <div class="w-40 px-2 flex justify-between"><span>Feb 7</span><span>Feb 14</span><span>Feb 21</span><span>Feb 28</span></div>
                 </div>
             </div>
-            <!-- Timeline Chart Body -->
-            <div id="ganttChartBody" class="flex-1 overflow-y-auto relative gantt-grid divide-y divide-slate-100 min-w-[800px]">
-                <!-- Populated via JavaScript -->
+            <!-- Timeline Chart Body with SVG Overlay -->
+            <div class="flex-1 overflow-y-auto relative gantt-grid min-w-[800px]">
+                <svg id="ganttSvgOverlay" class="absolute inset-0 w-full h-full pointer-events-none z-20" style="min-height: 100%;"></svg>
+                <div id="ganttChartBody" class="divide-y divide-slate-100 relative z-10">
+                    <!-- Populated via JavaScript -->
+                </div>
             </div>
         </div>
 
     </main>
+
+    <!-- Fullscreen Gantt Modal (100% Pure Gantt Timeline View) -->
+    <div id="fullscreenGanttModal" class="fixed inset-0 w-screen h-screen m-0 p-0 bg-slate-950 z-50 hidden flex flex-col">
+        <!-- Fullscreen Header -->
+        <div class="bg-slate-900 text-white px-6 py-4 flex justify-between items-center border-b border-slate-800 shrink-0">
+            <div class="flex items-center space-x-3">
+                <span class="bg-rose-600 text-xs uppercase px-2.5 py-1 rounded font-semibold tracking-wider">Pantalla Completa 100%</span>
+                <h2 class="text-lg font-bold">Diagrama de Gantt - Vista Ampliada de Cronograma y Dependencias</h2>
+            </div>
+            <button onclick="closeFullscreenGantt()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center space-x-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                <span>Cerrar Pantalla Completa</span>
+            </button>
+        </div>
+        <!-- Fullscreen Timeline Body (100% Width Timeline) -->
+        <div class="flex-1 flex flex-col bg-slate-50 overflow-x-auto relative w-full h-full">
+            <!-- Timeline Months Header -->
+            <div class="bg-white border-b border-slate-200 sticky top-0 z-30 flex flex-col min-w-[1400px]">
+                <div class="flex border-b border-slate-200 text-xs font-bold text-slate-700 bg-slate-100">
+                    <div class="w-72 border-r border-slate-200 px-3 py-2 text-center">Octubre 2026</div>
+                    <div class="w-72 border-r border-slate-200 px-3 py-2 text-center">Noviembre 2026</div>
+                    <div class="w-72 border-r border-slate-200 px-3 py-2 text-center">Diciembre 2026</div>
+                    <div class="w-72 border-r border-slate-200 px-3 py-2 text-center">Enero 2027</div>
+                    <div class="w-72 px-3 py-2 text-center">Febrero 2027</div>
+                </div>
+                <div class="flex text-[10px] text-slate-500 bg-slate-50 h-8 items-center">
+                    <div class="w-72 border-r border-slate-200 px-4 flex justify-between"><span>Sem 1 (Oct 4)</span><span>Sem 2 (Oct 11)</span><span>Sem 3 (Oct 18)</span><span>Sem 4 (Oct 25)</span></div>
+                    <div class="w-72 border-r border-slate-200 px-4 flex justify-between"><span>Sem 5 (Nov 1)</span><span>Sem 6 (Nov 8)</span><span>Sem 7 (Nov 15)</span><span>Sem 8 (Nov 22)</span></div>
+                    <div class="w-72 border-r border-slate-200 px-4 flex justify-between"><span>Sem 9 (Dic 6)</span><span>Sem 10 (Dic 13)</span><span>Sem 11 (Dic 20)</span><span>Sem 12 (Dic 27)</span></div>
+                    <div class="w-72 border-r border-slate-200 px-4 flex justify-between"><span>Sem 13 (Ene 3)</span><span>Sem 14 (Ene 10)</span><span>Sem 15 (Ene 17)</span><span>Sem 16 (Ene 24)</span></div>
+                    <div class="w-72 px-4 flex justify-between"><span>Sem 17 (Feb 7)</span><span>Sem 18 (Feb 14)</span><span>Sem 19 (Feb 21)</span><span>Sem 20 (Feb 28)</span></div>
+                </div>
+            </div>
+            <!-- Timeline Chart Body with SVG Overlay -->
+            <div class="flex-1 overflow-y-auto relative gantt-grid min-w-[1400px] bg-slate-50/50">
+                <svg id="fsGanttSvgOverlay" class="absolute inset-0 w-full h-full pointer-events-none z-20" style="min-height: 100%;"></svg>
+                <div id="fsGanttChartBody" class="divide-y divide-slate-100 relative z-10"></div>
+            </div>
+        </div>
+    </div>
 
     <!-- Smartsheet Task Detail & Edit Modal -->
     <div id="taskModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
@@ -157,10 +206,14 @@
                                 <input type="text" id="modalTaskCost" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-3 gap-3">
                             <div>
                                 <label class="block font-semibold text-slate-600 mb-1">Duration</label>
                                 <input type="text" id="modalTaskDuration" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block font-semibold text-slate-600 mb-1">Predecessors</label>
+                                <input type="text" id="modalTaskPredec" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="ej. 3; 4">
                             </div>
                             <div>
                                 <label class="block font-semibold text-slate-600 mb-1">% Completado</label>
@@ -351,50 +404,50 @@
     <script>
         let projectData = [
             {
-                id: "fase1", type: "phase", name: "FASE I: DIAGNÓSTICO Y BLUEPRINT CONTABLE", duration: "42d", assignee: "heydi.ricanqui@unmsm.edu.pe", budget: "$21,000.00", actualCost: "$20,500.00", variance: "$500.00", status: "In Progress", percent: "50.00%", efficiency: "2.38%", area: "CONTABILIDAD", offset: 0, width: 35, color: "bg-indigo-600",
+                id: "fase1", type: "phase", name: "FASE I: DIAGNÓSTICO Y BLUEPRINT CONTABLE", duration: "42d", assignee: "heydi.ricanqui@unmsm.edu.pe", budget: "$21,000.00", actualCost: "$20,500.00", variance: "$500.00", status: "In Progress", percent: "50.00%", efficiency: "2.38%", area: "CONTABILIDAD", predecessors: "", isCritical: true, offset: 0, width: 35, color: "bg-rose-600",
                 children: [
-                    { id: "t1_1", type: "task", name: "Levantamiento de procesos contables actuales (As-Is)", duration: "16d", assignee: "YESLIT ROSIÉ CORREA ATUCS", budget: "$6,000.00", actualCost: "$5,500.00", variance: "$500.00", status: "In Progress", percent: "100.00%", efficiency: "8.33%", area: "CONTABILIDAD", offset: 0, width: 7, color: "bg-sky-500" },
-                    { id: "t1_1_1", type: "subtask", name: "Inventariar el plan de cuentas actual (PCGE)", duration: "5d", assignee: "YESLIT ROSIÉ CORREA ATUCS", budget: "$1,500.00", actualCost: "$1,500.00", variance: "$0.00", status: "Complete", percent: "100.00%", efficiency: "0.00%", area: "CONTABILIDAD", offset: 1, width: 3, color: "bg-sky-400" },
-                    { id: "t1_1_2", type: "subtask", name: "Listar procesos contables (compras, inventarios, costos, activos fijos, cierre)", duration: "5d", assignee: "YESLIT ROSIÉ CORREA ATUCS", budget: "$2,500.00", actualCost: "$2,500.00", variance: "$0.00", status: "Complete", percent: "100.00%", efficiency: "0.00%", area: "CONTABILIDAD", offset: 3, width: 4, color: "bg-sky-400" },
-                    { id: "t1_1_3", type: "subtask", name: "Identificar brechas del esquema actual", duration: "6d", assignee: "YESLIT ROSIÉ CORREA ATUCS", budget: "$2,000.00", actualCost: "$1,500.00", variance: "$500.00", status: "Complete", percent: "100.00%", efficiency: "25.00%", area: "CONTABILIDAD", offset: 5, width: 3, color: "bg-sky-400" },
-                    { id: "t1_2", type: "task", name: "Diseño del catálogo de cuentas y estructura de costos en el ERP", duration: "26d", assignee: "YESLIT ROSIÉ CORREA ATUCS", budget: "$8,000.00", actualCost: "$8,000.00", variance: "$0.00", status: "Complete", percent: "100.00%", efficiency: "0.00%", area: "CONTABILIDAD", offset: 7, width: 14, color: "bg-sky-500" },
-                    { id: "t1_3", type: "task", name: "Elaboración de la matriz de riesgos de la inversión e impacto", duration: "4d", assignee: "RICANQUI RAMIREZ", budget: "$4,000.00", actualCost: "$4,000.00", variance: "$0.00", status: "Complete", percent: "100.00%", efficiency: "0.00%", area: "FINANZAS Y CAPEX", offset: 15, width: 6, color: "bg-rose-500" },
-                    { id: "t1_4", type: "task", name: "Estimación del presupuesto Capex y flujo de ahorros esperados", duration: "4d", assignee: "henry mauricio huamani", budget: "$3,000.00", actualCost: "$3,000.00", variance: "$0.00", status: "Complete", percent: "100.00%", efficiency: "0.00%", area: "FINANZAS Y CAPEX", offset: 18, width: 7, color: "bg-sky-500" }
+                    { id: "t1_1", type: "task", name: "Levantamiento de procesos contables actuales (As-Is)", duration: "16d", assignee: "YESLIT ROSIÉ CORREA ATUCS", budget: "$6,000.00", actualCost: "$5,500.00", variance: "$500.00", status: "In Progress", percent: "100.00%", efficiency: "8.33%", area: "CONTABILIDAD", predecessors: "", isCritical: true, offset: 0, width: 7, color: "bg-rose-500" },
+                    { id: "t1_1_1", type: "subtask", name: "Inventariar el plan de cuentas actual (PCGE)", duration: "5d", assignee: "YESLIT ROSIÉ CORREA ATUCS", budget: "$1,500.00", actualCost: "$1,500.00", variance: "$0.00", status: "Complete", percent: "100.00%", efficiency: "0.00%", area: "CONTABILIDAD", predecessors: "", isCritical: false, offset: 1, width: 3, color: "bg-sky-400" },
+                    { id: "t1_1_2", type: "subtask", name: "Listar procesos contables (compras, inventarios, costos, activos fijos, cierre)", duration: "5d", assignee: "YESLIT ROSIÉ CORREA ATUCS", budget: "$2,500.00", actualCost: "$2,500.00", variance: "$0.00", status: "Complete", percent: "100.00%", efficiency: "0.00%", area: "CONTABILIDAD", predecessors: "3", isCritical: true, offset: 3, width: 4, color: "bg-rose-500" },
+                    { id: "t1_1_3", type: "subtask", name: "Identificar brechas del esquema actual", duration: "6d", assignee: "YESLIT ROSIÉ CORREA ATUCS", budget: "$2,000.00", actualCost: "$1,500.00", variance: "$500.00", status: "Complete", percent: "100.00%", efficiency: "25.00%", area: "CONTABILIDAD", predecessors: "4", isCritical: true, offset: 5, width: 3, color: "bg-rose-500" },
+                    { id: "t1_2", type: "task", name: "Diseño del catálogo de cuentas y estructura de costos en el ERP", duration: "26d", assignee: "YESLIT ROSIÉ CORREA ATUCS", budget: "$8,000.00", actualCost: "$8,000.00", variance: "$0.00", status: "Complete", percent: "100.00%", efficiency: "0.00%", area: "CONTABILIDAD", predecessors: "2", isCritical: false, offset: 7, width: 14, color: "bg-sky-500" },
+                    { id: "t1_3", type: "task", name: "Elaboración de la matriz de riesgos de la inversión e impacto", duration: "4d", assignee: "RICANQUI RAMIREZ", budget: "$4,000.00", actualCost: "$4,000.00", variance: "$0.00", status: "Complete", percent: "100.00%", efficiency: "0.00%", area: "FINANZAS Y CAPEX", predecessors: "2", isCritical: true, offset: 15, width: 6, color: "bg-rose-500" },
+                    { id: "t1_4", type: "task", name: "Estimación del presupuesto Capex y flujo de ahorros esperados", duration: "4d", assignee: "henry mauricio huamani", budget: "$3,000.00", actualCost: "$3,000.00", variance: "$0.00", status: "Complete", percent: "100.00%", efficiency: "0.00%", area: "FINANZAS Y CAPEX", predecessors: "7; 8", isCritical: true, offset: 18, width: 7, color: "bg-rose-500" }
                 ]
             },
             {
-                id: "fase2", type: "phase", name: "FASE II: CONFIGURACIÓN, ADQUISICIÓN Y CONTROL INTERNO", duration: "20d", assignee: "hmauriciohuamani@gmail.com", budget: "$50,000.00", actualCost: "$52,300.00", variance: "-$2,300.00", status: "Complete", percent: "100.00%", efficiency: "-4.60%", area: "FINANZAS Y CAPEX", offset: 22, width: 28, color: "bg-indigo-600",
+                id: "fase2", type: "phase", name: "FASE II: CONFIGURACIÓN, ADQUISICIÓN Y CONTROL INTERNO", duration: "20d", assignee: "hmauriciohuamani@gmail.com", budget: "$50,000.00", actualCost: "$52,300.00", variance: "-$2,300.00", status: "Complete", percent: "100.00%", efficiency: "-4.60%", area: "FINANZAS Y CAPEX", predecessors: "", isCritical: true, offset: 22, width: 28, color: "bg-rose-600",
                 children: [
-                    { id: "t2_1", type: "task", name: "Gestión y adquisición de licencias Cloud del ERP", duration: "5d", assignee: "henry mauricio huamani", budget: "$35,000.00", actualCost: "$38,000.00", variance: "-$3,000.00", status: "Complete", percent: "100.00%", efficiency: "-8.57%", area: "FINANZAS Y CAPEX", offset: 22, width: 8, color: "bg-rose-500" },
-                    { id: "t2_2", type: "task", name: "Configuración de reglas de Segregación de Funciones (SoD)", duration: "10d", assignee: "heydi.ricanqui@unmsm.edu.pe", budget: "$6,000.00", actualCost: "$5,800.00", variance: "$200.00", status: "Complete", percent: "100.00%", efficiency: "3.33%", area: "CONTROL INTERNO Y CALIDAD", offset: 26, width: 7, color: "bg-sky-500" },
-                    { id: "t2_3", type: "task", name: "Creación de reglas y flujos de automatización en Smartsheet", duration: "10d", assignee: "heydi.ricanqui@unmsm.edu.pe", budget: "$4,000.00", actualCost: "$4,000.00", variance: "$0.00", status: "Complete", percent: "100.00%", efficiency: "0.00%", area: "CONTROL INTERNO Y CALIDAD", offset: 28, width: 7, color: "bg-sky-500" },
-                    { id: "t2_4", type: "task", name: "Control presupuestal y configuración de fórmulas financieras", duration: "5d", assignee: "hmauriciohuamani@gmail.com", budget: "$5,000.00", actualCost: "$4,500.00", variance: "$500.00", status: "Enviado", percent: "100.00%", efficiency: "10.00%", area: "FINANZAS Y CAPEX", offset: 31, width: 10, color: "bg-sky-500" }
+                    { id: "t2_1", type: "task", name: "Gestión y adquisición de licencias Cloud del ERP", duration: "5d", assignee: "henry mauricio huamani", budget: "$35,000.00", actualCost: "$38,000.00", variance: "-$3,000.00", status: "Complete", percent: "100.00%", efficiency: "-8.57%", area: "FINANZAS Y CAPEX", predecessors: "12", isCritical: true, offset: 22, width: 8, color: "bg-rose-500" },
+                    { id: "t2_2", type: "task", name: "Configuración de reglas de Segregación de Funciones (SoD)", duration: "10d", assignee: "heydi.ricanqui@unmsm.edu.pe", budget: "$6,000.00", actualCost: "$5,800.00", variance: "$200.00", status: "Complete", percent: "100.00%", efficiency: "3.33%", area: "CONTROL INTERNO Y CALIDAD", predecessors: "14", isCritical: false, offset: 26, width: 7, color: "bg-sky-500" },
+                    { id: "t2_3", type: "task", name: "Creación de reglas y flujos de automatización en Smartsheet", duration: "10d", assignee: "heydi.ricanqui@unmsm.edu.pe", budget: "$4,000.00", actualCost: "$4,000.00", variance: "$0.00", status: "Complete", percent: "100.00%", efficiency: "0.00%", area: "CONTROL INTERNO Y CALIDAD", predecessors: "14", isCritical: false, offset: 28, width: 7, color: "bg-sky-500" },
+                    { id: "t2_4", type: "task", name: "Control presupuestal y configuración de fórmulas financieras", duration: "5d", assignee: "hmauriciohuamani@gmail.com", budget: "$5,000.00", actualCost: "$4,500.00", variance: "$500.00", status: "Enviado", percent: "100.00%", efficiency: "10.00%", area: "FINANZAS Y CAPEX", predecessors: "15", isCritical: true, offset: 31, width: 10, color: "bg-rose-500" }
                 ]
             },
             {
-                id: "fase3", type: "phase", name: "FASE III: MIGRACIÓN DE DATOS Y PRUEBAS UAT", duration: "74d", assignee: "dayabotellosald@gmail.com", budget: "$22,000.00", actualCost: "$23,200.00", variance: "-$1,200.00", status: "In Progress", percent: "50.00%", efficiency: "-5.45%", area: "CONTABILIDAD", offset: 38, width: 42, color: "bg-indigo-600",
+                id: "fase3", type: "phase", name: "FASE III: MIGRACIÓN DE DATOS Y PRUEBAS UAT", duration: "74d", assignee: "dayabotellosald@gmail.com", budget: "$22,000.00", actualCost: "$23,200.00", variance: "-$1,200.00", status: "In Progress", percent: "50.00%", efficiency: "-5.45%", area: "CONTABILIDAD", predecessors: "", isCritical: true, offset: 38, width: 42, color: "bg-rose-600",
                 children: [
-                    { id: "t3_1", type: "task", name: "Depuración y carga de saldos iniciales del plan de cuentas", duration: "54d", assignee: "yeslit.correa@unmsm.edu.pe", budget: "$7,000.00", actualCost: "$7,000.00", variance: "$0.00", status: "In Progress", percent: "50.00%", efficiency: "0.00%", area: "CONTABILIDAD", offset: 38, width: 16, color: "bg-sky-500" },
-                    { id: "t3_2", type: "task", name: "Habilitación del Formulario de Incidencias UAT en Smartsheet", duration: "10d", assignee: "dayabotellosald@gmail.com", budget: "$8,000.00", actualCost: "$9,200.00", variance: "-$1,200.00", status: "Aprobado", percent: "100.00%", efficiency: "-15.00%", area: "CONTROL INTERNO Y CALIDAD", offset: 50, width: 6, color: "bg-rose-500" },
-                    { id: "t3_3", type: "task", name: "Migración del módulo de Activos Fijos y depreciación acumulada", duration: "10d", assignee: "yeslit.correa@unmsm.edu.pe", budget: "$2,000.00", actualCost: "$2,000.00", variance: "$0.00", status: "Not Started", percent: "0.00%", efficiency: "0.00%", area: "CONTABILIDAD", offset: 52, width: 8, color: "bg-sky-500" },
-                    { id: "t3_4", type: "task", name: "Ejecución de pruebas de integración contable-financiera", duration: "11d", assignee: "dayabotellosald@gmail.com", budget: "$5,000.00", actualCost: "$5,000.00", variance: "$0.00", status: "Not Started", percent: "0.00%", efficiency: "0.00%", area: "CONTROL INTERNO Y CALIDAD", offset: 56, width: 11, color: "bg-sky-500" }
+                    { id: "t3_1", type: "task", name: "Depuración y carga de saldos iniciales del plan de cuentas", duration: "54d", assignee: "yeslit.correa@unmsm.edu.pe", budget: "$7,000.00", actualCost: "$7,000.00", variance: "$0.00", status: "In Progress", percent: "50.00%", efficiency: "0.00%", area: "CONTABILIDAD", predecessors: "16", isCritical: true, offset: 38, width: 16, color: "bg-rose-500" },
+                    { id: "t3_2", type: "task", name: "Habilitación del Formulario de Incidencias UAT en Smartsheet", duration: "10d", assignee: "dayabotellosald@gmail.com", budget: "$8,000.00", actualCost: "$9,200.00", variance: "-$1,200.00", status: "Aprobado", percent: "100.00%", efficiency: "-15.00%", area: "CONTROL INTERNO Y CALIDAD", predecessors: "", isCritical: false, offset: 50, width: 6, color: "bg-sky-500" },
+                    { id: "t3_3", type: "task", name: "Migración del módulo de Activos Fijos y depreciación acumulada", duration: "10d", assignee: "yeslit.correa@unmsm.edu.pe", budget: "$2,000.00", actualCost: "$2,000.00", variance: "$0.00", status: "Not Started", percent: "0.00%", efficiency: "0.00%", area: "CONTABILIDAD", predecessors: "20", isCritical: false, offset: 52, width: 8, color: "bg-sky-500" },
+                    { id: "t3_4", type: "task", name: "Ejecución de pruebas de integración contable-financiera", duration: "11d", assignee: "dayabotellosald@gmail.com", budget: "$5,000.00", actualCost: "$5,000.00", variance: "$0.00", status: "Not Started", percent: "0.00%", efficiency: "0.00%", area: "CONTROL INTERNO Y CALIDAD", predecessors: "21; 10", isCritical: true, offset: 56, width: 11, color: "bg-rose-500" }
                 ]
             },
             {
-                id: "fase4", type: "phase", name: "FASE IV: CAPACITACIÓN Y GESTIÓN DEL CAMBIO", duration: "11d", assignee: "gianpierre.cardenas@unmsm", budget: "$11,000.00", actualCost: "$10,800.00", variance: "$200.00", status: "Complete", percent: "100.00%", efficiency: "1.82%", area: "TECNOLOGIA Y CAPACITACION", offset: 65, width: 25, color: "bg-indigo-600",
+                id: "fase4", type: "phase", name: "FASE IV: CAPACITACIÓN Y GESTIÓN DEL CAMBIO", duration: "11d", assignee: "gianpierre.cardenas@unmsm", budget: "$11,000.00", actualCost: "$10,800.00", variance: "$200.00", status: "Complete", percent: "100.00%", efficiency: "1.82%", area: "TECNOLOGIA Y CAPACITACION", predecessors: "", isCritical: false, offset: 65, width: 25, color: "bg-indigo-600",
                 children: [
-                    { id: "t4_1", type: "task", name: "Elaboración de manuales de usuario para el área contable", duration: "5d", assignee: "gianpierre.cardenas@unmsm", budget: "$3,000.00", actualCost: "$2,800.00", variance: "$200.00", status: "Aprobado", percent: "100.00%", efficiency: "6.67%", area: "TECNOLOGIA Y CAPACITACION", offset: 65, width: 8, color: "bg-sky-500" },
-                    { id: "t4_2", type: "task", name: "Capacitación técnica al equipo de Contabilidad y Tributos", duration: "6d", assignee: "gianpierre.cardenas@unmsm", budget: "$6,000.00", actualCost: "$6,000.00", variance: "$0.00", status: "Aprobado", percent: "100.00%", efficiency: "0.00%", area: "TECNOLOGIA Y CAPACITACION", offset: 70, width: 10, color: "bg-sky-500" },
-                    { id: "t4_3", type: "task", name: "Organización y seguimiento del tablero Kanban de capacitación", duration: "4d", assignee: "gianpierre.cardenas@unmsm", budget: "$2,000.00", actualCost: "$2,000.00", variance: "$0.00", status: "Enviado", percent: "100.00%", efficiency: "0.00%", area: "TECNOLOGIA Y CAPACITACION", offset: 73, width: 14, color: "bg-sky-500" }
+                    { id: "t4_1", type: "task", name: "Elaboración de manuales de usuario para el área contable", duration: "5d", assignee: "gianpierre.cardenas@unmsm", budget: "$3,000.00", actualCost: "$2,800.00", variance: "$200.00", status: "Aprobado", percent: "100.00%", efficiency: "6.67%", area: "TECNOLOGIA Y CAPACITACION", predecessors: "26", isCritical: false, offset: 65, width: 8, color: "bg-sky-500" },
+                    { id: "t4_2", type: "task", name: "Capacitación técnica al equipo de Contabilidad y Tributos", duration: "6d", assignee: "gianpierre.cardenas@unmsm", budget: "$6,000.00", actualCost: "$6,000.00", variance: "$0.00", status: "Aprobado", percent: "100.00%", efficiency: "0.00%", area: "TECNOLOGIA Y CAPACITACION", predecessors: "28", isCritical: false, offset: 70, width: 10, color: "bg-sky-500" },
+                    { id: "t4_3", type: "task", name: "Organización y seguimiento del tablero Kanban de capacitación", duration: "4d", assignee: "gianpierre.cardenas@unmsm", budget: "$2,000.00", actualCost: "$2,000.00", variance: "$0.00", status: "Enviado", percent: "100.00%", efficiency: "0.00%", area: "TECNOLOGIA Y CAPACITACION", predecessors: "28", isCritical: false, offset: 73, width: 14, color: "bg-sky-500" }
                 ]
             },
             {
-                id: "fase5", type: "phase", name: "FASE V: GO-LIVE, DASHBOARD Y AUDITORÍA FINAL", duration: "10d", assignee: "Velasquez Machado Guisel", budget: "$16,000.00", actualCost: "$14,500.00", variance: "$1,500.00", status: "Complete", percent: "100.00%", efficiency: "9.38%", area: "Gestión de Proyecto", offset: 82, width: 20, color: "bg-indigo-600",
+                id: "fase5", type: "phase", name: "FASE V: GO-LIVE, DASHBOARD Y AUDITORÍA FINAL", duration: "10d", assignee: "Velasquez Machado Guisel", budget: "$16,000.00", actualCost: "$14,500.00", variance: "$1,500.00", status: "Complete", percent: "100.00%", efficiency: "9.38%", area: "Gestión de Proyecto", predecessors: "", isCritical: true, offset: 82, width: 20, color: "bg-rose-600",
                 children: [
-                    { id: "t5_1", type: "task", name: "Diseño del Dashboard Ejecutivo con métricas e indicadores", duration: "5d", assignee: "oshin.tarazona@unmsm.edu.pe", budget: "$4,000.00", actualCost: "$3,500.00", variance: "$500.00", status: "Aprobado", percent: "100.00%", efficiency: "12.50%", area: "Business Intelligence", offset: 82, width: 7, color: "bg-sky-500" },
-                    { id: "t5_2", type: "task", name: "Configuración de gráficos en tiempo real y medidores de avance", duration: "3d", assignee: "oshin.tarazona@unmsm.edu.pe", budget: "$3,000.00", actualCost: "$2,000.00", variance: "$1,000.00", status: "Complete", percent: "100.00%", efficiency: "33.33%", area: "Business Intelligence", offset: 86, width: 7, color: "bg-sky-500" },
-                    { id: "t5_3", type: "task", name: "Cierre de fase de pruebas y autorización de salida a producción", duration: "1d", assignee: "Velasquez Machado Guisel", budget: "$5,000.00", actualCost: "$5,000.00", variance: "$0.00", status: "Not Started", percent: "0.00%", efficiency: "0.00%", area: "Gestión de Proyecto", offset: 90, width: 4, color: "bg-rose-500" },
-                    { id: "t5_4", type: "task", name: "Auditoría de calidad y validación final de la Ruta Crítica", duration: "1d", assignee: "Velasquez Machado Guisel", budget: "$4,000.00", actualCost: "$4,000.00", variance: "$0.00", status: "Not Started", percent: "0.00%", efficiency: "0.00%", area: "Gestión de Proyecto", offset: 92, width: 4, color: "bg-rose-500" }
+                    { id: "t5_1", type: "task", name: "Diseño del Dashboard Ejecutivo con métricas e indicadores", duration: "5d", assignee: "oshin.tarazona@unmsm.edu.pe", budget: "$4,000.00", actualCost: "$3,500.00", variance: "$500.00", status: "Aprobado", percent: "100.00%", efficiency: "12.50%", area: "Business Intelligence", predecessors: "29", isCritical: false, offset: 82, width: 7, color: "bg-sky-500" },
+                    { id: "t5_2", type: "task", name: "Configuración de gráficos en tiempo real y medidores de avance", duration: "3d", assignee: "oshin.tarazona@unmsm.edu.pe", budget: "$3,000.00", actualCost: "$2,000.00", variance: "$1,000.00", status: "Complete", percent: "100.00%", efficiency: "33.33%", area: "Business Intelligence", predecessors: "32", isCritical: false, offset: 86, width: 7, color: "bg-sky-500" },
+                    { id: "t5_3", type: "task", name: "Cierre de fase de pruebas y autorización de salida a producción", duration: "1d", assignee: "Velasquez Machado Guisel", budget: "$5,000.00", actualCost: "$5,000.00", variance: "$0.00", status: "Not Started", percent: "0.00%", efficiency: "0.00%", area: "Gestión de Proyecto", predecessors: "33; 30", isCritical: true, offset: 90, width: 4, color: "bg-rose-500" },
+                    { id: "t5_4", type: "task", name: "Auditoría de calidad y validación final de la Ruta Crítica", duration: "1d", assignee: "Velasquez Machado Guisel", budget: "$4,000.00", actualCost: "$4,000.00", variance: "$0.00", status: "Not Started", percent: "0.00%", efficiency: "0.00%", area: "Gestión de Proyecto", predecessors: "34", isCritical: true, offset: 92, width: 4, color: "bg-rose-500" }
                 ]
             }
         ];
@@ -419,9 +472,16 @@
         function renderGantt() {
             const tableBody = document.getElementById("taskTableBody");
             const chartBody = document.getElementById("ganttChartBody");
-            let tableHTML = "", chartHTML = "";
+            const svgOverlay = document.getElementById("ganttSvgOverlay");
+
+            let tableHTML = "";
+            let chartHTML = "";
+            let barCoordinates = {};
+            let globalRowIdx = 0;
 
             projectData.forEach(phase => {
+                globalRowIdx++;
+                const phaseRowNumber = globalRowIdx;
                 const isExpanded = expandedPhases[phase.id];
                 const chevron = isExpanded
                     ? `<svg class="w-4 h-4 text-slate-500 transform rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>`
@@ -429,17 +489,19 @@
 
                 const varColorP = (phase.variance && phase.variance.startsWith("-")) ? "text-rose-600 font-semibold" : "text-emerald-600 font-semibold";
                 const effColorP = (phase.efficiency && phase.efficiency.startsWith("-")) ? "text-rose-600" : "text-emerald-600";
+                const criticalBadge = phase.isCritical ? `<span class="bg-rose-100 text-rose-700 text-[9px] px-1.5 py-0.5 rounded font-bold ml-1">Crítica</span>` : "";
 
                 tableHTML += `
                     <div onclick="togglePhase('${phase.id}')" class="grid grid-cols-12 px-3 py-2.5 bg-indigo-50/70 hover:bg-indigo-100/75 cursor-pointer font-semibold text-indigo-900 border-b border-indigo-100 items-center transition">
                         <div class="col-span-3 flex items-center space-x-1.5 truncate">
                             ${chevron}
                             <span class="truncate" title="${phase.name}">${phase.name}</span>
+                            ${criticalBadge}
                         </div>
                         <div class="col-span-2 text-slate-600 truncate text-[11px]" title="${phase.assignee}">${phase.assignee}</div>
                         <div class="col-span-1 text-right font-mono">${phase.budget}</div>
                         <div class="col-span-1 text-right font-mono">${phase.actualCost}</div>
-                        <div class="col-span-1 text-right font-mono ${varColorP}">${phase.variance}</div>
+                        <div class="col-span-1 text-center font-mono text-slate-500">${phase.predecessors || ""}</div>
                         <div class="col-span-1 text-center"><span class="bg-indigo-100 text-indigo-800 text-[10px] px-1.5 py-0.5 rounded">${phase.status}</span></div>
                         <div class="col-span-1 text-center font-medium">${phase.percent}</div>
                         <div class="col-span-1 text-right font-mono ${effColorP}">${phase.efficiency}</div>
@@ -447,10 +509,15 @@
                     </div>
                 `;
 
+                const phaseY = (phaseRowNumber - 1) * 36 + 18;
+                const phaseX1 = phase.offset * 8;
+                const phaseX2 = phaseX1 + (phase.width * 8);
+                barCoordinates[phaseRowNumber] = { x1: phaseX1, x2: phaseX2, y: phaseY, isCritical: phase.isCritical };
+
                 chartHTML += `
-                    <div class="h-10 flex items-center px-2 relative border-b border-slate-100 bg-indigo-50/30">
-                        <div onclick="openTaskModal('${phase.id}')" class="absolute h-4 rounded-md ${phase.color} opacity-85 flex items-center px-2 text-[10px] text-white font-medium shadow-sm cursor-pointer hover:opacity-100 hover:scale-[1.01] transition-all"
-                             style="left: ${phase.offset * 8}px; width: ${phase.width * 8}px;" title="Editar: ${phase.name}">
+                    <div class="h-[36px] flex items-center px-2 relative border-b border-slate-100 bg-indigo-50/30">
+                        <div onclick="openTaskModal('${phase.id}')" class="absolute h-4 rounded-md ${phase.color} opacity-90 flex items-center px-2 text-[10px] text-white font-medium shadow-sm cursor-pointer hover:opacity-100 hover:scale-[1.01] transition-all ${phase.isCritical ? 'ring-2 ring-rose-400' : ''}"
+                             style="left: ${phaseX1}px; width: ${phase.width * 8}px;" title="Editar: ${phase.name} ${phase.isCritical ? '(Ruta Crítica)' : ''}">
                             <span class="truncate">${phase.name}</span>
                         </div>
                     </div>
@@ -458,21 +525,25 @@
 
                 if (isExpanded && phase.children) {
                     phase.children.forEach(child => {
+                        globalRowIdx++;
+                        const childRowNumber = globalRowIdx;
                         const varColor = (child.variance && child.variance.startsWith("-")) ? "text-rose-600 font-semibold" : "text-emerald-600";
                         const effColor = (child.efficiency && child.efficiency.startsWith("-")) ? "text-rose-600" : "text-emerald-600";
                         const isSub = child.type === 'subtask';
                         const indentClass = isSub ? "pl-7 text-slate-600" : "pl-4 text-slate-700 font-medium";
+                        const cCriticalBadge = child.isCritical ? `<span class="bg-rose-100 text-rose-700 text-[9px] px-1.5 py-0.5 rounded font-bold ml-1">Crítica</span>` : "";
 
                         tableHTML += `
                             <div class="grid grid-cols-12 px-3 py-2 hover:bg-slate-50 border-b border-slate-100 items-center transition text-[11px]">
                                 <div class="col-span-3 flex items-center space-x-1.5 ${indentClass} truncate">
                                     <span class="w-1.5 h-1.5 rounded-full bg-slate-400 inline-block"></span>
                                     <span class="truncate" title="${child.name}">${child.name}</span>
+                                    ${cCriticalBadge}
                                 </div>
                                 <div class="col-span-2 text-slate-500 truncate text-[10px]" title="${child.assignee}">${child.assignee}</div>
                                 <div class="col-span-1 text-right font-mono text-slate-600">${child.budget}</div>
                                 <div class="col-span-1 text-right font-mono text-slate-600">${child.actualCost}</div>
-                                <div class="col-span-1 text-right font-mono ${varColor}">${child.variance}</div>
+                                <div class="col-span-1 text-center font-mono text-slate-500">${child.predecessors || ""}</div>
                                 <div class="col-span-1 text-center"><span class="bg-slate-100 text-slate-700 text-[9px] px-1.5 py-0.5 rounded">${child.status}</span></div>
                                 <div class="col-span-1 text-center text-slate-600">${child.percent}</div>
                                 <div class="col-span-1 text-right font-mono ${effColor}">${child.efficiency}</div>
@@ -480,10 +551,15 @@
                             </div>
                         `;
 
+                        const childY = (childRowNumber - 1) * 36 + 18;
+                        const childX1 = child.offset * 8;
+                        const childX2 = childX1 + (child.width * 8);
+                        barCoordinates[childRowNumber] = { x1: childX1, x2: childX2, y: childY, isCritical: child.isCritical };
+
                         chartHTML += `
-                            <div class="h-9 flex items-center px-2 relative border-b border-slate-100 hover:bg-slate-50/80 transition">
-                                <div onclick="openTaskModal('${child.id}')" class="absolute h-3.5 rounded ${child.color} opacity-90 flex items-center px-1.5 text-[9px] text-white shadow-xs cursor-pointer hover:scale-[1.01] transition-all"
-                                     style="left: ${child.offset * 8}px; width: ${child.width * 8}px;" title="Editar: ${child.name}">
+                            <div class="h-[36px] flex items-center px-2 relative border-b border-slate-100 hover:bg-slate-50/80 transition">
+                                <div onclick="openTaskModal('${child.id}')" class="absolute h-3.5 rounded ${child.color} opacity-90 flex items-center px-1.5 text-[9px] text-white shadow-xs cursor-pointer hover:scale-[1.01] transition-all ${child.isCritical ? 'ring-2 ring-rose-400' : ''}"
+                                     style="left: ${childX1}px; width: ${child.width * 8}px;" title="Editar: ${child.name} ${child.isCritical ? '(Ruta Crítica)' : ''}">
                                     <span class="truncate">${child.name}</span>
                                 </div>
                             </div>
@@ -492,8 +568,201 @@
                 }
             });
 
+            // Generate SVG Dependency Connector Lines
+            let svgPaths = "";
+            let rowMap = {};
+            let curR = 0;
+            projectData.forEach(phase => {
+                curR++;
+                rowMap[curR] = { id: phase.id, predecessors: phase.predecessors };
+                if (expandedPhases[phase.id] && phase.children) {
+                    phase.children.forEach(child => {
+                        curR++;
+                        rowMap[curR] = { id: child.id, predecessors: child.predecessors };
+                    });
+                }
+            });
+
+            function drawLink(pRow, cRow) {
+                if (barCoordinates[pRow] && barCoordinates[cRow]) {
+                    const source = barCoordinates[pRow];
+                    const target = barCoordinates[cRow];
+
+                    const startX = source.x2;
+                    const startY = source.y;
+                    const endX = target.x1;
+                    const endY = target.y;
+
+                    let pathData = "";
+                    const isCrit = source.isCritical && target.isCritical;
+                    const strokeColor = isCrit ? "#ef4444" : "#2563eb";
+                    const strokeWidth = isCrit ? "2.5" : "1.5";
+                    const markerId = isCrit ? "url(#arrowCritical)" : "url(#arrow)";
+
+                    if (startY === endY) {
+                        pathData = `M ${startX} ${startY} L ${endX} ${endY}`;
+                    } else {
+                        const midX = startX + 12;
+                        if (endX > midX) {
+                            const midY = startY + (endY - startY) / 2;
+                            pathData = `M ${startX} ${startY} L ${midX} ${startY} L ${midX} ${endY} L ${endX} ${endY}`;
+                        } else {
+                            const nextX = Math.min(startX, endX) - 10;
+                            pathData = `M ${startX} ${startY} L ${nextX} ${startY} L ${nextX} ${endY} L ${endX} ${endY}`;
+                        }
+                    }
+
+                    svgPaths += `<path d="${pathData}" fill="none" stroke="${strokeColor}" stroke-width="${strokeWidth}" marker-end="${markerId}"/>`;
+                }
+            }
+
+            for (let r = 1; r <= curR; r++) {
+                if (rowMap[r] && rowMap[r].predecessors) {
+                    const preds = rowMap[r].predecessors.split(';').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+                    preds.forEach(pRow => {
+                        drawLink(pRow, r);
+                    });
+                }
+            }
+
             tableBody.innerHTML = tableHTML;
             chartBody.innerHTML = chartHTML;
+
+            const totalSvgHeight = curR * 36;
+            svgOverlay.style.height = `${totalSvgHeight}px`;
+
+            svgOverlay.innerHTML = `
+                <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                        <path d="M 0 1 L 10 5 L 0 9 z" fill="#2563eb"/>
+                    </marker>
+                    <marker id="arrowCritical" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                        <path d="M 0 1 L 10 5 L 0 9 z" fill="#ef4444"/>
+                    </marker>
+                </defs>
+                ${svgPaths}
+            `;
+        }
+
+        // Fullscreen Gantt Modal Logic (100% Pure Gantt Timeline View)
+        function openFullscreenGantt() {
+            document.getElementById("fullscreenGanttModal").classList.remove("hidden");
+            renderFullscreenGantt();
+        }
+
+        function closeFullscreenGantt() {
+            document.getElementById("fullscreenGanttModal").classList.add("hidden");
+        }
+
+        function renderFullscreenGantt() {
+            const fsChartBody = document.getElementById("fsGanttChartBody");
+            const fsSvgOverlay = document.getElementById("fsGanttSvgOverlay");
+
+            let chartHTML = "";
+            let barCoordinates = {};
+            let globalRowIdx = 0;
+
+            projectData.forEach(phase => {
+                globalRowIdx++;
+                const phaseRowNumber = globalRowIdx;
+                const isExpanded = expandedPhases[phase.id];
+
+                const phaseY = (phaseRowNumber - 1) * 36 + 18;
+                const phaseX1 = phase.offset * 12; // wider scaling for full screen
+                const phaseX2 = phaseX1 + (phase.width * 12);
+                barCoordinates[phaseRowNumber] = { x1: phaseX1, x2: phaseX2, y: phaseY, isCritical: phase.isCritical };
+
+                chartHTML += `
+                    <div class="h-[36px] flex items-center px-4 relative border-b border-slate-200 bg-indigo-50/20">
+                        <span class="absolute left-2 text-[10px] font-bold text-slate-500 w-12">${phaseRowNumber}.</span>
+                        <div class="absolute h-5 rounded-md ${phase.color} opacity-95 flex items-center px-3 text-[11px] text-white font-bold shadow-sm ${phase.isCritical ? 'ring-2 ring-rose-400' : ''}"
+                             style="left: ${phaseX1 + 50}px; width: ${phase.width * 12}px;" title="${phase.name}">
+                            <span class="truncate">${phase.name}</span>
+                        </div>
+                    </div>
+                `;
+
+                if (isExpanded && phase.children) {
+                    phase.children.forEach(child => {
+                        globalRowIdx++;
+                        const childRowNumber = globalRowIdx;
+                        const childY = (childRowNumber - 1) * 36 + 18;
+                        const childX1 = child.offset * 12;
+                        const childX2 = childX1 + (child.width * 12);
+                        barCoordinates[childRowNumber] = { x1: childX1 + 50, x2: childX2 + 50, y: childY, isCritical: child.isCritical };
+
+                        chartHTML += `
+                            <div class="h-[36px] flex items-center px-4 relative border-b border-slate-100 hover:bg-slate-100/60 transition">
+                                <span class="absolute left-2 text-[10px] text-slate-400 w-12">${childRowNumber}.</span>
+                                <div class="absolute h-4 rounded ${child.color} opacity-90 flex items-center px-2 text-[10px] text-white font-medium shadow-xs ${child.isCritical ? 'ring-2 ring-rose-400' : ''}"
+                                     style="left: ${childX1 + 50}px; width: ${child.width * 12}px;" title="${child.name}">
+                                    <span class="truncate">${child.name}</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            });
+
+            let svgPaths = "";
+            let rowMap = {};
+            let curR = 0;
+            projectData.forEach(phase => {
+                curR++;
+                rowMap[curR] = { predecessors: phase.predecessors };
+                if (expandedPhases[phase.id] && phase.children) {
+                    phase.children.forEach(child => {
+                        curR++;
+                        rowMap[curR] = { predecessors: child.predecessors };
+                    });
+                }
+            });
+
+            function drawFsLink(pRow, cRow) {
+                if (barCoordinates[pRow] && barCoordinates[cRow]) {
+                    const source = barCoordinates[pRow];
+                    const target = barCoordinates[cRow];
+                    const startX = source.x2;
+                    const startY = source.y;
+                    const endX = target.x1;
+                    const endY = target.y;
+
+                    const isCrit = source.isCritical && target.isCritical;
+                    const strokeColor = isCrit ? "#ef4444" : "#2563eb";
+                    const strokeWidth = isCrit ? "2.5" : "1.5";
+                    const markerId = isCrit ? "url(#fsArrowCritical)" : "url(#fsArrow)";
+
+                    let pathData = "";
+                    if (startY === endY) {
+                        pathData = `M ${startX} ${startY} L ${endX} ${endY}`;
+                    } else {
+                        const midX = startX + 15;
+                        pathData = `M ${startX} ${startY} L ${midX} ${startY} L ${midX} ${endY} L ${endX} ${endY}`;
+                    }
+                    svgPaths += `<path d="${pathData}" fill="none" stroke="${strokeColor}" stroke-width="${strokeWidth}" marker-end="${markerId}"/>`;
+                }
+            }
+
+            for (let r = 1; r <= curR; r++) {
+                if (rowMap[r] && rowMap[r].predecessors) {
+                    const preds = rowMap[r].predecessors.split(';').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+                    preds.forEach(pRow => drawFsLink(pRow, r));
+                }
+            }
+
+            fsChartBody.innerHTML = chartHTML;
+            fsSvgOverlay.style.height = `${curR * 36}px`;
+            fsSvgOverlay.innerHTML = `
+                <defs>
+                    <marker id="fsArrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                        <path d="M 0 1 L 10 5 L 0 9 z" fill="#2563eb"/>
+                    </marker>
+                    <marker id="fsArrowCritical" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                        <path d="M 0 1 L 10 5 L 0 9 z" fill="#ef4444"/>
+                    </marker>
+                </defs>
+                ${svgPaths}
+            `;
         }
 
         // Smartsheet Task Modal Logic
@@ -520,6 +789,7 @@
             document.getElementById("modalTaskBudget").value = taskObj.budget || "";
             document.getElementById("modalTaskCost").value = taskObj.actualCost || "";
             document.getElementById("modalTaskDuration").value = taskObj.duration || "";
+            document.getElementById("modalTaskPredec").value = taskObj.predecessors || "";
             document.getElementById("modalTaskPercent").value = taskObj.percent || "";
             document.getElementById("modalTaskStatus").value = taskObj.status || "In Progress";
             document.getElementById("modalTaskArea").value = taskObj.area || "";
@@ -542,6 +812,7 @@
                     phase.budget = document.getElementById("modalTaskBudget").value;
                     phase.actualCost = document.getElementById("modalTaskCost").value;
                     phase.duration = document.getElementById("modalTaskDuration").value;
+                    phase.predecessors = document.getElementById("modalTaskPredec").value;
                     phase.percent = document.getElementById("modalTaskPercent").value;
                     phase.status = document.getElementById("modalTaskStatus").value;
                     phase.area = document.getElementById("modalTaskArea").value;
@@ -554,6 +825,7 @@
                             child.budget = document.getElementById("modalTaskBudget").value;
                             child.actualCost = document.getElementById("modalTaskCost").value;
                             child.duration = document.getElementById("modalTaskDuration").value;
+                            child.predecessors = document.getElementById("modalTaskPredec").value;
                             child.percent = document.getElementById("modalTaskPercent").value;
                             child.status = document.getElementById("modalTaskStatus").value;
                             child.area = document.getElementById("modalTaskArea").value;
@@ -597,6 +869,7 @@
                     "Actual Cost": phase.actualCost,
                     "Budget Variance": phase.variance,
                     "Duration": phase.duration,
+                    "Predecessors": phase.predecessors,
                     "Status": phase.status,
                     "% Completado": phase.percent,
                     "Eficiencia": phase.efficiency,
@@ -611,6 +884,7 @@
                             "Actual Cost": child.actualCost,
                             "Budget Variance": child.variance,
                             "Duration": child.duration,
+                            "Predecessors": child.predecessors,
                             "Status": child.status,
                             "% Completado": child.percent,
                             "Eficiencia": child.efficiency,
@@ -623,7 +897,7 @@
             const worksheet = XLSX.utils.json_to_sheet(flatData);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Hoja de tareas");
-            XLSX.writeFile(workbook, "Proyecto_Alicorp_Exportado.xlsx");
+            XLSX.writeFile(workbook, "Proyecto_Alicorp_Predecesores.xlsx");
         }
 
         // Excel Import Function with parser & UI update
@@ -657,13 +931,15 @@
                                 actualCost: row["Actual Cost"] || row["Costo Real"] ? (typeof row["Actual Cost"] === 'number' ? `$${row["Actual Cost"].toLocaleString('en-US', {minimumFractionDigits: 2})}` : row["Actual Cost"]) : "$0.00",
                                 variance: row["Budget Variance"] || row["Variación"] || "$0.00",
                                 duration: row["Duration"] || row["Duración"] || "5d",
+                                predecessors: (row["Predecessors"] || row["Predec."] || "").toString(),
                                 status: row["Status"] || row["Estado"] || "In Progress",
                                 percent: row["% Completado"] ? (typeof row["% Completado"] === 'number' ? `${(row["% Completado"] * 100).toFixed(0)}%` : row["% Completado"]) : "0.00%",
                                 efficiency: row["Efficiency"] || row["Eficiencia"] || "0.00%",
                                 area: row["AREA"] || row["Área"] || "CONTABILIDAD",
+                                isCritical: taskName.includes("Crítica") || idx % 2 === 0,
                                 offset: idx * 3,
                                 width: 6,
-                                color: isPhase ? "bg-indigo-600" : "bg-sky-500",
+                                color: isPhase ? "bg-rose-600" : "bg-rose-500",
                                 children: []
                             };
 
@@ -737,13 +1013,11 @@
             const periodType = document.getElementById("inputPeriodType").value;
             const numPeriods = parseInt(document.getElementById("inputProjectionPeriods").value) || 12;
 
-            // Adjust discount rate k depending on whether periods are years or months
-            // If months, monthly rate = rawK / 12 (nominal) or equivalent
             const k = periodType === "months" ? rawK / 12 : rawK;
 
             let cashFlows = [];
             for (let i = 1; i <= numPeriods; i++) {
-                let factor = 0.05 + (i * 0.02); // incremental monthly or yearly factor
+                let factor = 0.05 + (i * 0.02);
                 cashFlows.push({ period: i, fc: D0 * factor });
             }
 
